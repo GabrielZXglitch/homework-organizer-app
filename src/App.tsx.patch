@@ -1,0 +1,11 @@
+--- src/App.tsx
++++ src/App.tsx
+@@ -7,2 +7,3 @@
+ import { ConcluirDever } from './pages/ConcluirDever';
++import { Historico } from './pages/Historico';
+ import { BottomNav } from './components/BottomNav';
+@@ -38,3 +39,3 @@
+       <Route path="/concluir/:id" element={<ProtectedRoute hideNav><ConcluirDever /></ProtectedRoute>} />
+-      <Route path="/historico" element={<ProtectedRoute><div className="p-8">Histórico a implementar. (Mapear homeworks onde status === 'concluido')</div></ProtectedRoute>} />
++      <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
+     </Routes>

@@ -4,14 +4,23 @@
 
 @layer base {
   html, body {
-    @apply min-h-screen bg-white;
-    -webkit-tap-highlight-color: transparent;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  body {
     overscroll-behavior: none;
   }
-
-  body {
+  .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
+  }
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 }
 
@@ -22,5 +31,27 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  
+  .font-headline-lg {
+    @apply text-2xl font-bold;
+  }
+  .font-headline-md {
+    @apply text-xl font-bold;
+  }
+  .font-title-sm {
+    @apply text-base font-semibold;
+  }
+  .font-body-md {
+    @apply text-base font-normal;
+  }
+  .font-body-sm {
+    @apply text-sm font-normal;
+  }
+  .font-label-md {
+    @apply text-sm font-semibold;
+  }
+  .font-label-sm {
+    @apply text-xs font-semibold;
   }
 }

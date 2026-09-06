@@ -1,111 +1,103 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import {
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { auth, db } from '../lib/firebase';
+import { 
+  onAuthStateChanged, 
+  User as FirebaseUser,
+  GoogleAuthProvider,
+  signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { auth, db, googleProvider } from '../config/firebase'
-import { AuthState } from '../types/auth'
-import { UserProfile } from '../types/user'
+  signOut
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import type { User } from '../types';
 
-interface AuthContextType extends AuthState {
-  signInWithEmail: (e: string, p: string) => Promise<void>
-  signUpWithEmail: (n: string, e: string, p: string) => Promise<void>
-  signInWithGoogle: () => Promise<void>
-  logout: () => Promise<void>
-  refreshUserProfile: () => Promise<void>
+interface AuthContextType {
+  currentUser: FirebaseUser | null;
+  userProfile: User | null;
+  loading: boolean;
+  loginWithEmail: (e: string, p: string) => Promise<void>;
+  registerWithEmail: (n: string, e: string, p: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null)
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    userProfile: null,
-    loading: true,
-  })
-
-  const fetchProfile = async (uid: string) => {
-    const docRef = doc(db, 'users', uid)
-    const snap = await getDoc(docRef)
-    if (snap.exists()) {
-      setState(s => ({ ...s, userProfile: snap.data() as UserProfile }))
-    } else {
-      setState(s => ({ ...s, userProfile: null }))
-    }
-  }
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    let unsubscribeProfile: () => void;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      
       if (user) {
-        setState(s => ({ ...s, user }))
-        await fetchProfile(user.uid)
+        const userRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userRef);
+        
+        if (!docSnap.exists()) {
+          const newUser: User = {
+            userId: user.uid,
+            nome: user.displayName || 'Aluno',
+            email: user.email || '',
+            xpTotal: 0,
+            streakDias: 0,
+            ultimoConcluido: null,
+            createdAt: new Date()
+          };
+          await setDoc(userRef, newUser);
+        }
+
+        unsubscribeProfile = onSnapshot(userRef, (doc) => {
+          if (doc.exists()) {
+            setUserProfile(doc.data() as User);
+          }
+        });
       } else {
-        setState({ user: null, userProfile: null, loading: false })
+        setUserProfile(null);
+        if (unsubscribeProfile) unsubscribeProfile();
       }
-      setState(s => ({ ...s, loading: false }))
-    })
-    return () => unsub()
-  }, [])
+      setLoading(false);
+    });
 
-  const refreshUserProfile = async () => {
-    if (state.user) {
-      await fetchProfile(state.user.uid)
-    }
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
+  }, []);
+
+  async function loginWithEmail(email: string, pass: string) {
+    await signInWithEmailAndPassword(auth, email, pass);
   }
 
-  const signInWithEmail = async (e: string, p: string) => {
-    await signInWithEmailAndPassword(auth, e, p)
+  async function registerWithEmail(nome: string, email: string, pass: string) {
+    const { user } = await createUserWithEmailAndPassword(auth, email, pass);
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, { 
+      userId: user.uid, nome, email: user.email, xpTotal: 0, streakDias: 0, ultimoConcluido: null, createdAt: new Date() 
+    }, { merge: true });
   }
 
-  const signUpWithEmail = async (nome: string, email: string, p: string) => {
-    const res = await createUserWithEmailAndPassword(auth, email, p)
-    await updateProfile(res.user, { displayName: nome })
-    const profile: UserProfile = {
-      nome,
-      email,
-      xpTotal: 0,
-      streakDias: 0,
-      ultimoConcluido: null,
-    }
-    await setDoc(doc(db, 'users', res.user.uid), profile)
-    await fetchProfile(res.user.uid)
+  async function loginWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
   }
 
-  const signInWithGoogle = async () => {
-    const res = await signInWithPopup(auth, googleProvider)
-    const docRef = doc(db, 'users', res.user.uid)
-    const snap = await getDoc(docRef)
-    if (!snap.exists()) {
-      const profile: UserProfile = {
-        nome: res.user.displayName || '',
-        email: res.user.email || '',
-        xpTotal: 0,
-        streakDias: 0,
-        ultimoConcluido: null,
-      }
-      await setDoc(docRef, profile)
-    }
-    await fetchProfile(res.user.uid)
-  }
-
-  const logout = async () => {
-    await signOut(auth)
+  async function logout() {
+    await signOut(auth);
   }
 
   return (
-    <AuthContext.Provider value={{ ...state, signInWithEmail, signUpWithEmail, signInWithGoogle, logout, refreshUserProfile }}>
-      {children}
+    <AuthContext.Provider value={{ currentUser, userProfile, loading, loginWithEmail, registerWithEmail, loginWithGoogle, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
-  )
-}
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
+  );
 }

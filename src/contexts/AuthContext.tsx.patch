@@ -1,0 +1,33 @@
+--- src/contexts/AuthContext.tsx
++++ src/contexts/AuthContext.tsx
+@@ -5,2 +5,4 @@
+   GoogleAuthProvider,
++  signInWithEmailAndPassword,
++  createUserWithEmailAndPassword,
+   signInWithPopup,
+@@ -15,4 +17,6 @@
+   userProfile: User | null;
+   loading: boolean;
++  loginWithEmail: (e: string, p: string) => Promise<void>;
++  registerWithEmail: (n: string, e: string, p: string) => Promise<void>;
+   loginWithGoogle: () => Promise<void>;
+   logout: () => Promise<void>;
+@@ -62,2 +66,12 @@
+ 
++  async function loginWithEmail(email: string, pass: string) {
++    await signInWithEmailAndPassword(auth, email, pass);
++  }
++
++  async function registerWithEmail(nome: string, email: string, pass: string) {
++    const { user } = await createUserWithEmailAndPassword(auth, email, pass);
++    // Profile created via onAuthStateChanged
++    const userRef = doc(db, 'users', user.uid);
++    await setDoc(userRef, { userId: user.uid, nome, email, xpTotal: 0, streakDias: 0, ultimoConcluido: null, createdAt: new Date() }, { merge: true });
++  }
++
+   async function loginWithGoogle() {
+@@ -73,3 +87,3 @@
+   return (
+-    <AuthContext.Provider value={{ currentUser, userProfile, loading, loginWithGoogle, logout }}>
++    <AuthContext.Provider value={{ currentUser, userProfile, loading, loginWithEmail, registerWithEmail, loginWithGoogle, logout }}>
+       {!loading && children}

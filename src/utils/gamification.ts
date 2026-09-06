@@ -1,46 +1,36 @@
-interface GamificationInput {
-  xpTotal: number
-  streakDias: number
-  ultimoConcluido: { toDate: () => Date } | null
+import { isToday, isThisWeek, startOfDay, differenceInCalendarDays } from 'date-fns';
+import { Timestamp } from 'firebase/firestore';
+import type { Homework } from '../types';
+
+export function calculateXP(withPhoto: boolean): number {
+  return withPhoto ? 20 : 10;
 }
 
-interface GamificationResult {
-  xpGained: number
-  newXp: number
-  newStreak: number
+function toDate(d: Timestamp | Date): Date {
+  return d instanceof Timestamp ? d.toDate() : d;
 }
 
-export function calculateGamification(
-  user: GamificationInput,
-  exigeFoto: boolean,
-  now: Date = new Date()
-): GamificationResult {
-  const xpGained = exigeFoto ? 20 : 10
-  const newXp = user.xpTotal + xpGained
+export function calculateStreak(lastDate: Timestamp | Date | null, currentDate: Date, currentStreak: number): { streak: number, isConsecutive: boolean } {
+  if (!lastDate) return { streak: 1, isConsecutive: true };
+  
+  const last = toDate(lastDate);
+  const diff = differenceInCalendarDays(startOfDay(currentDate), startOfDay(last));
 
-  let newStreak: number
-
-  if (!user.ultimoConcluido) {
-    // First ever completion
-    newStreak = 1
+  if (diff === 0) {
+    return { streak: currentStreak, isConsecutive: false };
+  } else if (diff === 1) {
+    return { streak: currentStreak + 1, isConsecutive: true };
   } else {
-    const lastDate = user.ultimoConcluido.toDate()
-    const lastDay = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate())
-    const todayDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    const diffMs = todayDay.getTime() - lastDay.getTime()
-    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 0) {
-      // Same day — keep streak
-      newStreak = user.streakDias
-    } else if (diffDays === 1) {
-      // Consecutive day — increment
-      newStreak = user.streakDias + 1
-    } else {
-      // Gap — reset
-      newStreak = 1
-    }
+    return { streak: 1, isConsecutive: true };
   }
+}
 
-  return { xpGained, newXp, newStreak }
+export function filterHomeworksByPeriod(homeworks: Homework[], period: 'hoje' | 'semana' | 'todos'): Homework[] {
+  return homeworks.filter(hw => {
+    if (period === 'todos') return true;
+    const date = toDate(hw.prazo);
+    if (period === 'hoje') return isToday(date);
+    if (period === 'semana') return isThisWeek(date, { weekStartsOn: 1 });
+    return true;
+  });
 }
