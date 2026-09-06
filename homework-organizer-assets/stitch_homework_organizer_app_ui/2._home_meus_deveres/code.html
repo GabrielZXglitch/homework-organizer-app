@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "error-container": "#ffdad6",
+        "outline": "#777587",
+        "on-secondary": "#ffffff",
+        "secondary-fixed-dim": "#4edea3",
+        "inverse-primary": "#c3c0ff",
+        "tertiary-fixed-dim": "#ffb95f",
+        "error": "#ba1a1a",
+        "surface-container-low": "#eff4ff",
+        "on-tertiary-fixed-variant": "#653e00",
+        "primary-container": "#4f46e5",
+        "on-background": "#0b1c30",
+        "on-primary": "#ffffff",
+        "surface-tint": "#4d44e3",
+        "surface-container": "#e5eeff",
+        "primary": "#3525cd",
+        "secondary-fixed": "#6ffbbe",
+        "on-tertiary": "#ffffff",
+        "primary-fixed": "#e2dfff",
+        "surface-variant": "#d3e4fe",
+        "on-surface-variant": "#464555",
+        "secondary": "#006c49",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#0b1c30",
+        "outline-variant": "#c7c4d8",
+        "surface-container-high": "#dce9ff",
+        "inverse-on-surface": "#eaf1ff",
+        "inverse-surface": "#213145",
+        "on-secondary-fixed": "#002113",
+        "surface-dim": "#cbdbf5",
+        "tertiary-container": "#885500",
+        "on-tertiary-fixed": "#2a1700",
+        "on-error": "#ffffff",
+        "on-primary-fixed-variant": "#3323cc",
+        "on-primary-fixed": "#0f0069",
+        "on-tertiary-container": "#ffd4a4",
+        "secondary-container": "#6cf8bb",
+        "background": "#f8f9ff",
+        "on-error-container": "#93000a",
+        "on-secondary-container": "#00714d",
+        "on-secondary-fixed-variant": "#005236",
+        "surface-container-highest": "#d3e4fe",
+        "surface": "#f8f9ff",
+        "tertiary": "#684000",
+        "surface-bright": "#f8f9ff",
+        "tertiary-fixed": "#ffddb8",
+        "primary-fixed-dim": "#c3c0ff",
+        "on-primary-container": "#dad7ff"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "card-padding-md": "1rem",
+        "card-padding-sm": "0.75rem",
+        "touch-target-min": "2.75rem",
+        "gap-md": "0.75rem",
+        "screen-margin-mobile": "1rem",
+        "gap-sm": "0.5rem",
+        "bottom-nav-height": "4.25rem",
+        "gap-xs": "0.25rem",
+        "gap-lg": "1rem",
+        "gap-xl": "1.5rem",
+        "screen-margin-tablet": "1.5rem",
+        "card-padding-lg": "1.25rem"
+      },
+      "fontFamily": {
+        "body-md": ["Plus Jakarta Sans"],
+        "title-sm": ["Plus Jakarta Sans"],
+        "body-sm": ["Plus Jakarta Sans"],
+        "headline-lg": ["Plus Jakarta Sans"],
+        "label-md": ["Plus Jakarta Sans"],
+        "headline-md": ["Plus Jakarta Sans"],
+        "display-lg": ["Plus Jakarta Sans"],
+        "body-lg": ["Plus Jakarta Sans"],
+        "label-sm": ["Plus Jakarta Sans"]
+      },
+      "fontSize": {
+        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "title-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+        "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "500" }],
+        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }]
+      }
+    }
+  }
+}</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-screen-margin-mobile flex items-center justify-between"><div class="flex items-center gap-gap-sm"><span class="font-headline-md text-headline-md text-on-surface tracking-tight">Meus Deveres</span></div><div class="flex items-center gap-gap-xs"><button aria-label="Buscar" class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">search</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-[5rem] px-screen-margin-mobile bg-surface"><div class="flex flex-col w-full pb-20">
+<!-- Header Subtitle & Daily Progress Banner -->
+<section class="mb-gap-lg">
+<div class="flex items-center justify-between mb-gap-sm">
+<div>
+<p class="font-headline-md text-headline-md text-on-surface tracking-tight">Hoje, 24 de Outubro</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1.5 mt-0.5">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span><strong class="font-title-sm text-primary">4 tarefas</strong> pendentes para hoje</span>
+</p>
+</div>
+<div class="w-12 h-12 rounded-2xl bg-surface-container-low flex items-center justify-center relative">
+<!-- SVG Micro Progress Ring -->
+<svg class="w-10 h-10 -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-primary-container transition-all duration-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="60, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<span class="absolute font-label-sm text-label-sm text-primary font-bold">60%</span>
+</div>
+</div>
+<!-- Quick Filter Tabs -->
+<div class="flex items-center gap-gap-xs overflow-x-auto py-1 no-scrollbar" role="tablist">
+<button aria-selected="false" class="filter-tab px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" onclick="setFilter(this, 'all')" role="tab">
+        Todos
+      </button>
+<button aria-selected="true" class="filter-tab px-4 py-2 rounded-full font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all flex items-center gap-1.5" onclick="setFilter(this, 'today')" role="tab">
+<span>Para hoje</span>
+<span class="w-4 h-4 rounded-full bg-white/20 text-on-primary flex items-center justify-center text-[10px] font-bold">1</span>
+</button>
+<button aria-selected="false" class="filter-tab px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" onclick="setFilter(this, 'week')" role="tab">
+        Esta semana
+      </button>
+</div>
+</section>
+<!-- Homework Cards List -->
+<section class="flex flex-col gap-gap-md" id="task-list">
+<!-- Card 1: Matemática -->
+<article class="task-card bg-surface-container-lowest rounded-2xl p-card-padding-md shadow-sm transition-all duration-300" data-period="today" data-task-id="1">
+<div class="flex items-start gap-gap-md">
+<!-- Completed Check Ring -->
+<button aria-label="Marcar Matemática como concluída" class="check-btn flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary-fixed" onclick="toggleComplete(this, 1)">
+<span class="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
+</button>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-gap-xs mb-1.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed-variant">
+<span class="text-[13px]">📐</span>
+<span>Matemática</span>
+</span>
+<!-- Urgency Badge -->
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-error-container text-on-error-container animate-pulse">
+<span class="material-symbols-outlined text-[13px]">schedule</span>
+<span>Urgente</span>
+</span>
+</div>
+<h3 class="task-title font-title-sm text-title-sm text-on-surface line-clamp-2 transition-all">
+            Exercícios 1 a 15 da página 42 sobre matrizes
+          </h3>
+<div class="flex flex-wrap items-center justify-between gap-y-2 mt-3 pt-2">
+<div class="flex items-center gap-1 text-error font-body-sm text-body-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">alarm</span>
+<span>Hoje até às 18:00</span>
+</div>
+<!-- Photo Requirement Pill -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+<span>Exige foto</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 2: História -->
+<article class="task-card bg-surface-container-lowest rounded-2xl p-card-padding-md shadow-sm transition-all duration-300" data-period="week" data-task-id="2">
+<div class="flex items-start gap-gap-md">
+<!-- Completed Check Ring -->
+<button aria-label="Marcar História como concluída" class="check-btn flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary-fixed" onclick="toggleComplete(this, 2)">
+<span class="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
+</button>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-gap-xs mb-1.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed-variant">
+<span class="text-[13px]">🏛️</span>
+<span>História</span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Capítulo 8</span>
+</div>
+<h3 class="task-title font-title-sm text-title-sm text-on-surface line-clamp-2 transition-all">
+            Resumo de 2 páginas sobre a Revolução Industrial
+          </h3>
+<div class="flex flex-wrap items-center justify-between gap-y-2 mt-3 pt-2">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span>Amanhã, 12:00</span>
+</div>
+<!-- Photo Requirement Pill -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+<span>Envio de foto</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3: Biologia -->
+<article class="task-card bg-surface-container-lowest rounded-2xl p-card-padding-md shadow-sm transition-all duration-300" data-period="week" data-task-id="3">
+<div class="flex items-start gap-gap-md">
+<!-- Completed Check Ring -->
+<button aria-label="Marcar Biologia como concluída" class="check-btn flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary-fixed" onclick="toggleComplete(this, 3)">
+<span class="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
+</button>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-gap-xs mb-1.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-container">
+<span class="text-[13px]">🧬</span>
+<span>Biologia</span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Prática</span>
+</div>
+<h3 class="task-title font-title-sm text-title-sm text-on-surface line-clamp-2 transition-all">
+            Relatório do experimento de fotossíntese
+          </h3>
+<div class="flex flex-wrap items-center justify-between gap-y-2 mt-3 pt-2">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span>Quinta-feira, 23:59</span>
+</div>
+<!-- Photo Requirement Pill -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+<span>Envio de foto</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 4: Português -->
+<article class="task-card bg-surface-container-lowest rounded-2xl p-card-padding-md shadow-sm transition-all duration-300" data-period="week" data-task-id="4">
+<div class="flex items-start gap-gap-md">
+<!-- Completed Check Ring -->
+<button aria-label="Marcar Português como concluída" class="check-btn flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary-fixed" onclick="toggleComplete(this, 4)">
+<span class="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
+</button>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-gap-xs mb-1.5">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant">
+<span class="text-[13px]">📚</span>
+<span>Português</span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Leitura</span>
+</div>
+<h3 class="task-title font-title-sm text-title-sm text-on-surface line-clamp-2 transition-all">
+            Análise literária de Dom Casmurro capítulos 1 a 5
+          </h3>
+<div class="flex flex-wrap items-center justify-between gap-y-2 mt-3 pt-2">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span>Sexta-feira, 14:00</span>
+</div>
+<!-- Photo Requirement Pill -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-low text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+<span>Envio de foto</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+</section>
+<!-- Delight Micro State: Quick Quote / Motivation -->
+<aside class="mt-gap-xl p-card-padding-md rounded-2xl bg-surface-container-low flex items-center gap-gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-secondary-fixed text-[20px]">emoji_events</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider">Dica de foco</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Complete as tarefas com foto com boa luz natural para aprovação rápida!</p>
+</div>
+</aside>
+<!-- Floating Action Button (FAB) -->
+<aside class="fixed bottom-[5.25rem] right-4 z-40">
+<button aria-label="Adicionar novo dever de casa" class="w-14 h-14 rounded-full bg-primary-container text-on-primary shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+</aside>
+</div>
+<script>
+  function toggleComplete(button, taskId) {
+    const card = button.closest('.task-card');
+    const title = card.querySelector('.task-title');
+    const icon = button.querySelector('.check-icon');
+    const isCompleted = button.getAttribute('data-completed') === 'true';
+
+    if (!isCompleted) {
+      button.setAttribute('data-completed', 'true');
+      button.classList.remove('bg-surface-container-low');
+      button.classList.add('bg-secondary', 'text-on-secondary');
+      icon.classList.remove('text-transparent');
+      icon.classList.add('text-on-secondary');
+      title.classList.add('line-through', 'opacity-50');
+      card.classList.add('opacity-75');
+    } else {
+      button.setAttribute('data-completed', 'false');
+      button.classList.remove('bg-secondary', 'text-on-secondary');
+      button.classList.add('bg-surface-container-low');
+      icon.classList.add('text-transparent');
+      icon.classList.remove('text-on-secondary');
+      title.classList.remove('line-through', 'opacity-50');
+      card.classList.remove('opacity-75');
+    }
+  }
+
+  function setFilter(button, filterType) {
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm');
+      tab.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      tab.setAttribute('aria-selected', 'false');
+    });
+
+    button.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+    button.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm');
+    button.setAttribute('aria-selected', 'true');
+
+    const cards = document.querySelectorAll('.task-card');
+    cards.forEach(card => {
+      const period = card.getAttribute('data-period');
+      if (filterType === 'all') {
+        card.style.display = 'block';
+      } else if (filterType === 'today') {
+        card.style.display = (period === 'today') ? 'block' : 'none';
+      } else if (filterType === 'week') {
+        card.style.display = 'block';
+      }
+    });
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold"><div class="h-16 px-screen-margin-mobile flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center w-touch-target-min h-touch-target-min transition-colors gap-0.5 text-primary font-bold" data-path="meus-deveres" href="#"><span class="material-symbols-outlined text-[22px]">format_list_bulleted</span><span class="font-label-sm text-label-sm">Meus Deveres</span></a><a class="flex flex-col items-center justify-center w-touch-target-min h-touch-target-min text-on-surface-variant hover:text-on-surface transition-colors gap-0.5" data-path="historico" href="#"><span class="material-symbols-outlined text-[22px]">task_alt</span><span class="font-label-sm text-label-sm">Histórico</span></a></div></nav></body></html>
