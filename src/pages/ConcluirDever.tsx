@@ -3,45 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
 
-const verifyPhotoWithGroq = async (photoData: string): Promise<boolean> => {
-  console.log('GROQ KEY:', import.meta.env.VITE_GROQ_API_KEY ? 'presente' : 'ausente');
-  const base64Data = photoData.split(',')[1];
-  const mimeType = photoData.split(';')[0].split(':')[1];
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-      max_tokens: 10,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:${mimeType};base64,${base64Data}`
-            }
-          },
-          {
-            type: 'text',
-            text: 'Analise esta imagem. Responda APENAS com SIM se mostrar claramente um dever de casa, caderno, folha de exercícios, livro didático ou material escolar. Responda APENAS com NAO para qualquer outra coisa (parede, objeto, comida, selfie, climatizador, etc). Seja rigoroso.'
-          }
-        ]
-      }]
-    })
-  });
-
-  if (!response.ok) throw new Error(`Erro: ${response.status}`);
-
-  const data = await response.json();
-  const text = data.choices?.[0]?.message?.content?.trim().toUpperCase() || 'NAO';
-  return text.includes('SIM');
-};
-
 export function ConcluirDever() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -81,25 +42,32 @@ export function ConcluirDever() {
 
     setIsSubmitting(true);
     
-    // Validação com API da Groq
+    // Validação com API do Backend (Groq)
     if (photoData) {
       try {
-        const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-        if (!apiKey) {
-          console.warn("VITE_GROQ_API_KEY não está configurada, pulando validação de IA.");
-          await new Promise(resolve => setTimeout(resolve, 800));
-        } else {
-          const isPhotoValid = await verifyPhotoWithGroq(photoData);
-          
-          if (!isPhotoValid) {
-            alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
-            setIsSubmitting(false);
-            return;
-          }
+        const base64Data = photoData.split(',')[1];
+        const mimeType = photoData.split(';')[0].split(':')[1];
+
+        const response = await fetch('/api/verify-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64Data, mimeType })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erro na API de verificação');
+        }
+
+        const { aprovado } = await response.json();
+        
+        if (!aprovado) {
+          alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
+          setIsSubmitting(false);
+          return;
         }
       } catch (error) {
-        console.error("Erro ao verificar foto com Groq:", error);
-        alert('Ocorreu um erro ao validar sua foto. Verifique a chave de API e tente novamente.');
+        console.error("Erro ao verificar foto com Backend:", error);
+        alert('Ocorreu um erro ao validar sua foto. Tente novamente.');
         setIsSubmitting(false);
         return;
       }
