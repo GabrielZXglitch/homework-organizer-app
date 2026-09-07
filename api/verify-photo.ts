@@ -18,7 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         role: 'user',
         content: [
           { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } },
-          { type: 'text', text: 'Responda APENAS com SIM se a imagem mostrar dever de casa, caderno, folha de exercícios ou material escolar. Responda APENAS com NAO para qualquer outra coisa.' }
+          { type: 'text', text: 'Analise esta imagem. Responda APENAS com SIM se mostrar qualquer coisa relacionada a estudo ou escola: caderno, livro, livro didático, folha de papel com escrita, exercício, apostila, prova, anotações, texto impresso ou manuscrito, material escolar, tablet ou computador com conteúdo educacional. Responda APENAS com NAO apenas se for claramente uma foto sem nenhuma relação com estudo, como: parede, comida, selfie, paisagem, objeto doméstico, móvel, eletrodoméstico ou climatizador. Em caso de dúvida, responda SIM.' }
         ]
       }]
     })
