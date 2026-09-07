@@ -4,6 +4,7 @@ import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
 
 const verifyPhotoWithGroq = async (photoData: string): Promise<boolean> => {
+  console.log('GROQ KEY:', import.meta.env.VITE_GROQ_API_KEY ? 'presente' : 'ausente');
   const base64Data = photoData.split(',')[1];
   const mimeType = photoData.split(';')[0].split(':')[1];
 
