@@ -42,9 +42,62 @@ export function ConcluirDever() {
 
     setIsSubmitting(true);
     
-    // Simulate validation delay for photo
+    // Validação com API do Gemini
     if (photoData) {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      try {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+          console.warn("VITE_GEMINI_API_KEY não está configurada, pulando validação de IA.");
+          await new Promise(resolve => setTimeout(resolve, 800));
+        } else {
+          const base64Data = photoData.split(',')[1];
+          const mimeType = photoData.split(';')[0].split(':')[1];
+          
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: "Você é um assistente verificador de deveres de casa. Analise esta imagem e determine se é uma foto legítima de um dever de casa, anotações de aula, livro didático, material de estudo escolar/universitário, ou um estudante fazendo lição. Responda APENAS com a palavra 'SIM' se for válido ou 'NAO' se for uma foto inválida (ex: uma selfie aleatória, foto de comida, paisagem, etc)." },
+                  {
+                    inlineData: {
+                      mimeType: mimeType,
+                      data: base64Data
+                    }
+                  }
+                ]
+              }],
+              generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 10,
+              }
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Erro na API do Gemini: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          const respostaGemini = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || '';
+          
+          if (!respostaGemini.includes('SIM')) {
+            alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
+            setIsSubmitting(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao verificar foto com Gemini:", error);
+        // Se a API falhar, podemos aceitar por precaução ou pedir pra tentar de novo
+        // Aqui optamos por alertar e abortar, mas pode ser ajustado
+        alert('Ocorreu um erro ao validar sua foto. Tente novamente.');
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     confetti({
