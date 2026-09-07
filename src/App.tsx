@@ -1,3 +1,4 @@
+import { LandingPage } from './pages/LandingPage';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { HomeworkProvider } from './contexts/HomeworkContext';
@@ -33,12 +34,14 @@ function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-      <Route path="/novo" element={<ProtectedRoute hideNav><NovoDever /></ProtectedRoute>} />
-      <Route path="/concluir/:id" element={<ProtectedRoute hideNav><ConcluirDever /></ProtectedRoute>} />
-      <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
-      <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+      <Route path="/app" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/app/novo" element={<ProtectedRoute hideNav><NovoDever /></ProtectedRoute>} />
+      <Route path="/app/concluir/:id" element={<ProtectedRoute hideNav><ConcluirDever /></ProtectedRoute>} />
+      <Route path="/app/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
+      <Route path="/app/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+      <Route path="*" element={<Navigate to="/app" replace />} />
     </Routes>
   );
 }

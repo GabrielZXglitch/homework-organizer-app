@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export function Login() {
-  const { loginWithEmail, registerWithEmail, loginWithGoogle } = useAuth();
+  const { currentUser, loginWithEmail, registerWithEmail, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/app');
+    }
+  }, [currentUser, navigate]);
   
   const [isRegistering, setIsRegistering] = useState(false);
   const [nome, setNome] = useState('');
@@ -25,7 +31,7 @@ export function Login() {
       } else {
         await loginWithEmail(email, password);
       }
-      navigate('/');
+      navigate('/app');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Ocorreu um erro.');
@@ -38,7 +44,7 @@ export function Login() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      navigate('/');
+      navigate('/app');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Erro ao entrar com Google.');

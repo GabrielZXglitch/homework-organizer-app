@@ -15,7 +15,7 @@ export function ConcluirDever() {
 
   useEffect(() => {
     if (!hw) {
-      navigate('/');
+      navigate('/app');
     }
   }, [hw, navigate]);
 
@@ -57,7 +57,7 @@ export function ConcluirDever() {
     await completeHomework(hw.id, !!photoData);
     
     setTimeout(() => {
-      navigate('/');
+      navigate('/app');
     }, 1500);
   };
 

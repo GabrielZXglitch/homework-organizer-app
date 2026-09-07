@@ -59,7 +59,7 @@ export function NovoDever() {
         prioridade,
         exigeFoto
       });
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       console.error(err);
       alert('Erro ao salvar.');

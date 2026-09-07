@@ -100,12 +100,12 @@ export function Home() {
               <article key={hw.id} className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm transition-all duration-300">
                 <div className="flex items-start gap-3">
                   <button 
-                    onClick={() => navigate(`/concluir/${hw.id}`)}
+                    onClick={() => navigate(`/app/concluir/${hw.id}`)}
                     className="flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary/20"
                   >
                     <span className="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
                   </button>
-                  <div className="flex-1 min-w-0" onClick={() => navigate(`/concluir/${hw.id}`)}>
+                  <div className="flex-1 min-w-0" onClick={() => navigate(`/app/concluir/${hw.id}`)}>
                     <div className="flex items-center justify-between gap-1 mb-1.5 cursor-pointer">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
                         <span className="text-[13px]">{config.icon}</span>
@@ -140,7 +140,7 @@ export function Home() {
 
       <aside className="fixed bottom-[5.25rem] right-4 md:right-auto md:left-1/2 md:ml-[160px] z-40">
         <button 
-          onClick={() => navigate('/novo')}
+          onClick={() => navigate('/app/novo')}
           className="w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
         >
           <span className="material-symbols-outlined text-[28px]">add</span>
