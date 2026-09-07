@@ -1,0 +1,21 @@
+# Homework Organizer App
+
+> Um aplicativo PWA focado na organização de deveres de casa para estudantes, com gamificação e validação fotográfica.
+
+## Sobre o Projeto
+O Homework Organizer é uma aplicação web progressiva (PWA) construída com React, Vite e Firebase. Seu diferencial é exigir que o aluno tire uma foto do dever concluído como forma de comprovação e engajamento. As fotos são validadas localmente e não são armazenadas no servidor.
+
+## Funcionalidades Principais
+- **Dashboard (Meus Deveres):** Visão geral de todas as tarefas pendentes, categorizadas por disciplina.
+- **Criação de Tarefas:** Interface simples para adicionar novos deveres, selecionar disciplinas e definir prazos.
+- **Validação com Foto:** Ao concluir uma tarefa, o usuário utiliza a câmera do dispositivo para fotografar o caderno.
+- **Histórico:** Registro de todos os deveres concluídos com sucesso.
+- **Gamificação:** Feedback visual com confetes (canvas-confetti) ao finalizar as tarefas.
+
+## Stack Tecnológica
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Lucide React
+- **Backend/Database:** Firebase Authentication, Cloud Firestore
+- **Design:** Tipografia Plus Jakarta Sans, interface responsiva mobile-first (PWA)
+
+## Acesso e Uso
+O aplicativo requer autenticação (Email/Senha ou Google). Todas as tarefas são vinculadas ao usuário logado, garantindo privacidade e organização pessoal.
