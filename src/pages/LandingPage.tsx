@@ -19,6 +19,20 @@ const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, de
   }, []);
 
   return (
+    <div 
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+export function LandingPage() {
+  const navigate = useNavigate();
+
+  return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-main)] font-sans overflow-x-hidden selection:bg-primary/30">
       
       {/* Navbar */}
