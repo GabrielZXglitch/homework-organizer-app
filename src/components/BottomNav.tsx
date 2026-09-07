@@ -20,6 +20,13 @@ export function BottomNav() {
           <span className="material-symbols-outlined text-[22px]">task_alt</span>
           <span className="text-xs font-semibold">Histórico</span>
         </Link>
+        <Link 
+          to="/perfil" 
+          className={`flex flex-col items-center justify-center w-12 h-12 transition-colors gap-0.5 ${location.pathname === '/perfil' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'}`}
+        >
+          <span className="material-symbols-outlined text-[22px]">person</span>
+          <span className="text-xs font-semibold">Perfil</span>
+        </Link>
       </div>
     </nav>
   );

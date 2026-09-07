@@ -102,7 +102,7 @@ export function Login() {
               <input 
                 className="w-full h-12 bg-surface-container-low text-on-surface text-base placeholder:text-outline rounded-xl pl-11 pr-4 outline-none transition-colors focus:bg-surface-container-high" 
                 id="email-input" 
-                placeholder="seu.email@escola.com" 
+                placeholder="seuemail@gmail.com" 
                 required 
                 type="email"
                 value={email}

@@ -8,7 +8,7 @@ import { ptBR } from 'date-fns/locale';
 import { Timestamp } from 'firebase/firestore';
 
 export function Home() {
-  const { userProfile } = useAuth();
+  const { userProfile, currentUser } = useAuth();
   const { homeworks, loading } = useHomeworks();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'hoje' | 'semana' | 'todos'>('semana');
@@ -40,8 +40,8 @@ export function Home() {
             <span className="material-symbols-outlined text-outline text-2xl">person</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-on-surface">Olá, {userProfile?.nome.split(' ')[0]} 👋</span>
-            <span className="text-xs font-normal text-on-surface-variant">Pronto para focar?</span>
+            <span className="text-sm font-semibold text-on-surface">Olá, {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'} 👋</span>
+            <span className="text-xs text-on-surface-variant font-medium">Bora devorar esses deveres!</span>
           </div>
         </div>
         <div className="flex gap-2">

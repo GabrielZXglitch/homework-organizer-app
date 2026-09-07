@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { NovoDever } from './pages/NovoDever';
 import { ConcluirDever } from './pages/ConcluirDever';
 import { Historico } from './pages/Historico';
+import { Perfil } from './pages/Perfil';
 import { BottomNav } from './components/BottomNav';
 
 function ProtectedRoute({ children, hideNav = false }: { children: React.ReactNode, hideNav?: boolean }) {
@@ -37,6 +38,7 @@ function AppRoutes() {
       <Route path="/novo" element={<ProtectedRoute hideNav><NovoDever /></ProtectedRoute>} />
       <Route path="/concluir/:id" element={<ProtectedRoute hideNav><ConcluirDever /></ProtectedRoute>} />
       <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
+      <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
     </Routes>
   );
 }

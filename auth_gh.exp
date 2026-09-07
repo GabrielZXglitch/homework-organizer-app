@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+spawn gh auth login
+expect "What is your preferred protocol for Git operations on this host"
+send "\r"
+expect "Authenticate Git with your GitHub credentials"
+send "Y\r"
+expect "How would you like to authenticate GitHub CLI"
+send "\r"
+expect eof
