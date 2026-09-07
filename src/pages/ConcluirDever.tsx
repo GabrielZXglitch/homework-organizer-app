@@ -53,7 +53,8 @@ export function ConcluirDever() {
           const base64Data = photoData.split(',')[1];
           const mimeType = photoData.split(';')[0].split(':')[1];
           
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          const model = 'gemini-1.5-flash';
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ export function ConcluirDever() {
           });
 
           if (!response.ok) {
-            throw new Error(`Erro na API do Gemini: ${response.statusText}`);
+            throw new Error(`Erro na API do Gemini: ${response.status} - ${response.statusText}`);
           }
 
           const data = await response.json();
@@ -94,7 +95,7 @@ export function ConcluirDever() {
         console.error("Erro ao verificar foto com Gemini:", error);
         // Se a API falhar, podemos aceitar por precaução ou pedir pra tentar de novo
         // Aqui optamos por alertar e abortar, mas pode ser ajustado
-        alert('Ocorreu um erro ao validar sua foto. Tente novamente.');
+        alert('Ocorreu um erro ao validar sua foto. Verifique a chave de API e tente novamente.');
         setIsSubmitting(false);
         return;
       }
