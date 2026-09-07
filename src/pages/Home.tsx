@@ -50,22 +50,22 @@ export function Home() {
       <header className="pt-10 pb-6 flex items-end justify-between border-b border-[var(--border)]">
         <div>
           <h2 className="text-[var(--text-muted)] text-xs font-mono tracking-wider uppercase mb-1">
-            {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'User'}
+            {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'}
           </h2>
           <h1 className="text-[var(--text-main)] text-2xl font-bold tracking-tight">
-            Active Issues
+            Tarefas Ativas
           </h1>
         </div>
         <div className="flex gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Streak</span>
+            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Ofensiva</span>
             <span className="text-[var(--text-main)] text-sm font-semibold flex items-center gap-1">
               <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
               {userProfile?.streakDias || 0}
             </span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Experience</span>
+            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Experiência</span>
             <span className="text-primary text-sm font-semibold flex items-center gap-1">
               {userProfile?.xpTotal || 0} XP
             </span>
@@ -76,9 +76,9 @@ export function Home() {
       {/* Filter Tabs */}
       <div className="flex items-center gap-4 mt-6 mb-8 overflow-x-auto no-scrollbar">
         {[
-          { id: 'hoje', label: 'Today' },
-          { id: 'semana', label: 'This Week' },
-          { id: 'todos', label: 'All' }
+          { id: 'hoje', label: 'Hoje' },
+          { id: 'semana', label: 'Esta Semana' },
+          { id: 'todos', label: 'Todas' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -97,14 +97,14 @@ export function Home() {
       {/* Task List */}
       <section className="flex flex-col gap-[1px] bg-[var(--border)] rounded-lg overflow-hidden border border-[var(--border)]">
         {loading ? (
-          <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Loading issues...</div>
+          <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Carregando tarefas...</div>
         ) : displayedHomeworks.length === 0 ? (
           <div className="bg-[var(--surface)] py-12 flex flex-col items-center justify-center text-center">
             <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center mb-3">
               <span className="material-symbols-outlined text-[var(--text-muted)]">done_all</span>
             </div>
-            <p className="text-sm font-medium text-[var(--text-main)]">No active issues</p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">Inbox zero achieved.</p>
+            <p className="text-sm font-medium text-[var(--text-main)]">Nenhuma tarefa ativa</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">Tudo limpo por aqui.</p>
           </div>
         ) : (
           displayedHomeworks.map(hw => (
@@ -152,7 +152,7 @@ export function Home() {
           className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
         >
           <span className="material-symbols-outlined text-[18px]">add</span>
-          New Issue
+          Nova Tarefa
         </button>
       </aside>
     </main>

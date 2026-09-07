@@ -11,7 +11,6 @@ export function Historico() {
   
   const completedHomeworks = homeworks.filter(hw => hw.status === 'concluido');
   
-  // Aqui faríamos a filtragem real por data se necessário
   const displayed = completedHomeworks;
 
   const formatDate = (dateValue: Timestamp | Date) => {
@@ -23,13 +22,13 @@ export function Historico() {
     <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
       <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
         <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
-          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">History</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Histórico</span>
         </div>
       </header>
 
       <div className="px-5 pb-24 flex flex-col md:max-w-2xl md:mx-auto w-full mt-6">
         <h1 className="text-[var(--text-main)] text-2xl font-bold tracking-tight mb-6">
-          Resolved Issues
+          Tarefas Resolvidas
         </h1>
 
         <div className="flex items-center gap-4 mb-6">
@@ -37,23 +36,23 @@ export function Historico() {
             onClick={() => setFilter('mes')}
             className={`text-sm font-medium transition-colors pb-1 border-b-2 ${filter === 'mes' ? 'text-[var(--text-main)] border-[var(--text-main)]' : 'text-[var(--text-muted)] border-transparent'}`}
           >
-            This Month
+            Este Mês
           </button>
           <button 
             onClick={() => setFilter('todos')}
             className={`text-sm font-medium transition-colors pb-1 border-b-2 ${filter === 'todos' ? 'text-[var(--text-main)] border-[var(--text-main)]' : 'text-[var(--text-muted)] border-transparent'}`}
           >
-            All Time
+            Sempre
           </button>
         </div>
 
         <section className="flex flex-col gap-[1px] bg-[var(--border)] rounded-lg overflow-hidden border border-[var(--border)]">
           {loading ? (
-             <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Loading history...</div>
+             <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Carregando histórico...</div>
           ) : displayed.length === 0 ? (
             <div className="bg-[var(--surface)] p-12 text-center">
               <span className="material-symbols-outlined text-[var(--text-muted)] text-3xl mb-2">history</span>
-              <p className="text-[var(--text-main)] text-sm font-medium">No resolved issues yet</p>
+              <p className="text-[var(--text-main)] text-sm font-medium">Nenhuma tarefa resolvida ainda</p>
             </div>
           ) : (
             displayed.map(hw => (
@@ -66,7 +65,7 @@ export function Historico() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end shrink-0">
-                  <span className="text-[10px] font-mono text-[var(--text-muted)]">Completed</span>
+                  <span className="text-[10px] font-mono text-[var(--text-muted)]">Concluído em</span>
                   <span className="text-xs text-[var(--text-main)]">{formatDate(hw.dataConclusao || hw.prazo)}</span>
                 </div>
               </article>

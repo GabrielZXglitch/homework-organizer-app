@@ -22,11 +22,11 @@ export function NovoDever() {
   const [customSubjects, setCustomSubjects] = useState<string[]>([]);
 
   const defaultSubjects = [
-    { id: 'Matemática', label: 'Math' },
-    { id: 'História', label: 'History' },
-    { id: 'Ciências', label: 'Science' },
-    { id: 'Português', label: 'Language' },
-    { id: 'Inglês', label: 'English' }
+    { id: 'Matemática', label: 'Matemática' },
+    { id: 'História', label: 'História' },
+    { id: 'Ciências', label: 'Ciências' },
+    { id: 'Português', label: 'Português' },
+    { id: 'Inglês', label: 'Inglês' }
   ];
 
   const allSubjects = [
@@ -80,15 +80,15 @@ export function NovoDever() {
             onClick={() => navigate('/app')}
             className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
-            Cancel
+            Cancelar
           </button>
-          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">New Issue</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Nova Tarefa</span>
           <button 
             onClick={handleSubmit}
             disabled={saving || !titulo.trim()}
             className="text-primary hover:text-primary-hover disabled:text-[var(--text-muted)] transition-colors text-sm font-medium"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
       </header>
@@ -101,7 +101,7 @@ export function NovoDever() {
             <input 
               className="w-full bg-transparent text-[var(--text-main)] placeholder:text-[var(--text-muted)] text-3xl font-semibold tracking-tight focus:outline-none" 
               id="hwTitle" 
-              placeholder="Issue Title" 
+              placeholder="Título da Tarefa" 
               required 
               type="text"
               value={titulo}
@@ -115,7 +115,7 @@ export function NovoDever() {
             <textarea 
               className="w-full bg-transparent text-[var(--text-muted)] focus:text-[var(--text-main)] placeholder:text-[var(--text-muted)]/50 text-sm focus:outline-none resize-none transition-colors leading-relaxed" 
               id="hwDesc" 
-              placeholder="Add description..." 
+              placeholder="Adicionar descrição..." 
               rows={3}
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
@@ -127,7 +127,7 @@ export function NovoDever() {
             
             {/* Project / Subject */}
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Project</label>
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Matéria / Projeto</label>
               <div className="flex flex-wrap gap-2">
                 {allSubjects.map(s => (
                   <button
@@ -157,7 +157,7 @@ export function NovoDever() {
                       type="text"
                       className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text-main)] text-xs w-24 focus:outline-none focus:border-primary"
                       autoFocus
-                      placeholder="Name"
+                      placeholder="Nome"
                       value={newSubject}
                       onChange={e => setNewSubject(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSubject())}
@@ -170,7 +170,7 @@ export function NovoDever() {
 
             {/* Prazo */}
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Due Date</label>
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Data de Entrega</label>
               <div className="flex gap-2">
                 <input 
                   className="bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] px-3 py-1.5 rounded text-sm focus:outline-none focus:border-primary flex-1" 
@@ -191,12 +191,12 @@ export function NovoDever() {
 
             {/* Prioridade */}
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Priority</label>
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Prioridade</label>
               <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded p-1">
                 {[
-                  { value: 'tranquilo', label: 'Low' },
-                  { value: 'importante', label: 'Medium' },
-                  { value: 'urgente', label: 'High' }
+                  { value: 'tranquilo', label: 'Baixa' },
+                  { value: 'importante', label: 'Média' },
+                  { value: 'urgente', label: 'Alta' }
                 ].map(opt => (
                   <label key={opt.value} className="flex-1 cursor-pointer">
                     <input 
@@ -219,8 +219,8 @@ export function NovoDever() {
             <div className="flex flex-col justify-center">
               <label className="flex items-center gap-3 cursor-pointer group mt-4 sm:mt-0 p-3 rounded border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--text-muted)] transition-colors">
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-[var(--text-main)] block">Visual Proof</span>
-                  <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] block mt-0.5">Require photo</span>
+                  <span className="text-sm font-medium text-[var(--text-main)] block">Prova Visual</span>
+                  <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] block mt-0.5">Exigir foto</span>
                 </div>
                 <div className="relative">
                   <input checked={exigeFoto} onChange={(e) => setExigeFoto(e.target.checked)} className="sr-only peer" type="checkbox"/>

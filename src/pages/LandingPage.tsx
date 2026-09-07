@@ -19,20 +19,6 @@ const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, de
   }, []);
 
   return (
-    <div 
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-    >
-      {children}
-    </div>
-  );
-};
-
-export function LandingPage() {
-  const navigate = useNavigate();
-
-  return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-main)] font-sans overflow-x-hidden selection:bg-primary/30">
       
       {/* Navbar */}
@@ -42,14 +28,14 @@ export function LandingPage() {
             <div className="w-5 h-5 rounded-sm bg-[var(--text-main)] flex items-center justify-center">
               <span className="material-symbols-outlined text-[var(--background)] text-[14px]">bolt</span>
             </div>
-            HW Tracker
+            DeverTracker
           </div>
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/login')} className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
-              Log in
+              Entrar
             </button>
             <button onClick={() => navigate('/login')} className="text-sm font-medium bg-[var(--text-main)] text-[var(--background)] px-3 py-1.5 rounded hover:opacity-90 transition-opacity">
-              Sign up
+              Cadastrar
             </button>
           </div>
         </div>
@@ -63,16 +49,16 @@ export function LandingPage() {
         
         <RevealOnScroll>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 max-w-4xl mx-auto leading-[1.1] relative z-10">
-            Linear for your <br />
+            Linear para seus <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              studies.
+              estudos.
             </span>
           </h1>
         </RevealOnScroll>
         
         <RevealOnScroll delay={100}>
           <p className="text-lg md:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto font-light tracking-tight relative z-10">
-            A specialized issue tracker built for students. Plan tasks, verify completion with AI, and build an unbroken streak of productivity.
+            Um rastreador de tarefas especializado para estudantes. Planeje suas atividades, valide a conclusão com IA e construa uma sequência inquebrável de produtividade.
           </p>
         </RevealOnScroll>
         
@@ -82,7 +68,7 @@ export function LandingPage() {
               onClick={() => navigate('/login')}
               className="bg-[var(--text-main)] text-[var(--background)] h-12 px-8 rounded-full font-medium text-sm flex items-center gap-2 hover:scale-105 transition-transform"
             >
-              Start tracking
+              Começar a usar
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
           </div>
@@ -114,7 +100,7 @@ export function LandingPage() {
       <section className="py-24 px-6 border-t border-[var(--border)] relative z-10">
         <div className="max-w-6xl mx-auto">
           <RevealOnScroll>
-            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Built for execution.</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Criado para execução.</h2>
           </RevealOnScroll>
           <div className="grid md:grid-cols-2 gap-4">
             
@@ -123,9 +109,9 @@ export function LandingPage() {
                 <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
                   <span className="material-symbols-outlined text-[20px]">fact_check</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-2 tracking-tight">AI Verification</h3>
+                <h3 className="text-xl font-semibold mb-2 tracking-tight">Validação por IA</h3>
                 <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                  Upload a photo of your finished work. Our vision model instantly verifies the material, ensuring the issue can only be closed with undeniable proof.
+                  Envie uma foto do seu trabalho concluído. Nosso modelo de visão verifica o material instantaneamente, garantindo que a tarefa só seja fechada com provas inegáveis.
                 </p>
               </div>
             </RevealOnScroll>
@@ -135,9 +121,9 @@ export function LandingPage() {
                 <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
                   <span className="material-symbols-outlined text-[20px]">bolt</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-2 tracking-tight">Keyboard First</h3>
+                <h3 className="text-xl font-semibold mb-2 tracking-tight">Ágil e Focado</h3>
                 <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                  Navigate, create, and resolve issues at the speed of thought. The interface stays out of your way so you can focus on getting the work done.
+                  Navegue, crie e resolva tarefas na velocidade do pensamento. A interface não fica no seu caminho, permitindo que você foque apenas em concluir suas obrigações.
                 </p>
               </div>
             </RevealOnScroll>
@@ -149,9 +135,9 @@ export function LandingPage() {
                   <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
                     <span className="material-symbols-outlined text-[20px]">timeline</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 tracking-tight">Metrics that matter</h3>
+                  <h3 className="text-xl font-semibold mb-2 tracking-tight">Métricas que importam</h3>
                   <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                    Track your velocity over time. Maintain streaks and earn XP in a sophisticated environment that treats your studies like professional projects, not toys.
+                    Acompanhe sua produtividade ao longo do tempo. Mantenha sequências e ganhe XP num ambiente sofisticado que trata seus estudos como projetos reais, não como brinquedos.
                   </p>
                 </div>
               </div>
@@ -167,10 +153,10 @@ export function LandingPage() {
           <div className="w-4 h-4 rounded-sm bg-[var(--text-muted)] flex items-center justify-center">
             <span className="material-symbols-outlined text-[var(--background)] text-[12px]">bolt</span>
           </div>
-          HW Tracker
+          DeverTracker
         </div>
         <p className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-widest">
-          © {new Date().getFullYear()} Issue Tracking for Students
+          © {new Date().getFullYear()} Issue Tracking para Estudantes
         </p>
       </footer>
     </div>

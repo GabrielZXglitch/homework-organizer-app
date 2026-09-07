@@ -49,7 +49,7 @@ export function ConcluirDever() {
           body: JSON.stringify({ base64Data, mimeType })
         });
         
-        if (!response.ok) throw new Error('Network error');
+        if (!response.ok) throw new Error('Erro na rede');
 
         const { aprovado } = await response.json();
         
@@ -90,9 +90,9 @@ export function ConcluirDever() {
             className="flex items-center gap-1 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            Back
+            Voltar
           </button>
-          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Resolve Issue</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Resolver Tarefa</span>
         </div>
       </header>
 
@@ -123,18 +123,18 @@ export function ConcluirDever() {
               {!photoData ? (
                 <div className="w-full aspect-[4/3] rounded-lg bg-[var(--surface)] flex flex-col items-center justify-center p-6 border border-dashed border-[var(--border)] hover:border-primary/50 transition-colors">
                   <span className="material-symbols-outlined text-[32px] text-[var(--text-muted)] mb-3 group-hover:text-primary transition-colors">add_photo_alternate</span>
-                  <p className="text-sm font-medium text-[var(--text-main)]">Upload Proof</p>
-                  <p className="text-[10px] font-mono text-[var(--text-muted)] uppercase mt-2">Required</p>
+                  <p className="text-sm font-medium text-[var(--text-main)]">Enviar Comprovante</p>
+                  <p className="text-[10px] font-mono text-[var(--text-muted)] uppercase mt-2">Obrigatório</p>
                 </div>
               ) : (
                 <div className="w-full aspect-[4/3] rounded-lg shadow-sm overflow-hidden relative border border-[var(--border)]">
                   <img className="w-full h-full object-cover" src={photoData} alt="Preview" />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white text-sm font-medium">Replace Image</span>
+                    <span className="text-white text-sm font-medium">Trocar Imagem</span>
                   </div>
                   <div className="absolute top-3 right-3 bg-secondary/90 backdrop-blur-md px-2 py-1 rounded flex items-center gap-1 shadow-sm">
                     <span className="material-symbols-outlined text-white text-[14px]">done</span>
-                    <span className="text-[10px] font-mono uppercase text-white">Attached</span>
+                    <span className="text-[10px] font-mono uppercase text-white">Anexado</span>
                   </div>
                 </div>
               )}
@@ -144,8 +144,8 @@ export function ConcluirDever() {
           <div className="bg-[var(--surface)] p-6 rounded-lg border border-[var(--border)] flex items-start gap-3">
             <span className="material-symbols-outlined text-[var(--text-muted)]">info</span>
             <div>
-              <p className="text-sm font-medium text-[var(--text-main)]">No visual proof required.</p>
-              <p className="text-xs text-[var(--text-muted)] mt-1">You can mark this issue as resolved immediately.</p>
+              <p className="text-sm font-medium text-[var(--text-main)]">Nenhuma prova visual exigida.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Você pode marcar essa tarefa como concluída imediatamente.</p>
             </div>
           </div>
         )}
@@ -159,7 +159,7 @@ export function ConcluirDever() {
             {isSubmitting ? (
               <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
             ) : null}
-            <span>{isSubmitting ? 'Validating...' : 'Mark as Resolved'}</span>
+            <span>{isSubmitting ? 'Validando...' : 'Marcar como Concluído'}</span>
           </button>
         </div>
       </div>

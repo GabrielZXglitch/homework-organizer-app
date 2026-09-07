@@ -47,10 +47,10 @@ export function Login() {
             <span className="material-symbols-outlined text-[var(--background)] text-[24px]">bolt</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-main)]">
-            {isLogin ? 'Welcome back' : 'Create your account'}
+            {isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}
           </h1>
           <p className="text-[var(--text-muted)] text-sm mt-2">
-            {isLogin ? 'Enter your details to access your issues.' : 'Start tracking your studies today.'}
+            {isLogin ? 'Insira seus dados para acessar suas tarefas.' : 'Comece a organizar seus estudos hoje.'}
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {!isLogin && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Full Name</label>
+              <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Nome Completo</label>
               <input 
                 className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
                 type="text" 
@@ -75,7 +75,7 @@ export function Login() {
           )}
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Email</label>
+            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">E-mail</label>
             <input 
               className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
               type="email" 
@@ -86,7 +86,7 @@ export function Login() {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Password</label>
+            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Senha</label>
             <input 
               className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
               type="password" 
@@ -101,13 +101,13 @@ export function Login() {
             disabled={loading}
             className="w-full h-10 bg-[var(--text-main)] text-[var(--background)] font-medium text-sm rounded mt-2 hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50"
           >
-            {loading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : (isLogin ? 'Continue' : 'Sign up')}
+            {loading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : (isLogin ? 'Continuar' : 'Cadastrar')}
           </button>
         </form>
 
         <div className="relative flex items-center py-6">
           <div className="flex-grow border-t border-[var(--border)]"></div>
-          <span className="flex-shrink-0 mx-4 text-[10px] font-mono uppercase text-[var(--text-muted)]">Or</span>
+          <span className="flex-shrink-0 mx-4 text-[10px] font-mono uppercase text-[var(--text-muted)]">Ou</span>
           <div className="flex-grow border-t border-[var(--border)]"></div>
         </div>
 
@@ -118,7 +118,7 @@ export function Login() {
           className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] font-medium text-sm rounded hover:bg-[var(--surface-hover)] transition-colors flex items-center justify-center gap-2"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-          Continue with Google
+          Continuar com Google
         </button>
 
         <div className="mt-8 text-center">
@@ -127,7 +127,7 @@ export function Login() {
             onClick={() => setIsLogin(!isLogin)}
             className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-sm transition-colors"
           >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+            {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Faça login"}
           </button>
         </div>
       </div>
