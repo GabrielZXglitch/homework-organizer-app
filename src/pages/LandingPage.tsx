@@ -1,323 +1,177 @@
-import { useState, useEffect, useRef, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 
-function RevealOnScroll({ children, delay = 0 }: { children: ReactNode, delay?: number }) {
+// Fade in up animation helper
+const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.unobserve(entry.target);
       }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
+    }, { threshold: 0.1 });
+    
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div 
-      ref={ref} 
-      className={`transition-all duration-700 ease-out w-full ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
     >
       {children}
     </div>
   );
-}
+};
 
 export function LandingPage() {
   const navigate = useNavigate();
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex(openFaqIndex === index ? null : index);
-  };
-
-  const faqs = [
-    { q: "O app é gratuito?", a: "Sim, 100% gratuito. 💸" },
-    { q: "Precisa instalar?", a: "Não, roda no navegador. Mas pode instalar como PWA no celular pra ficar mais fácil! 📱" },
-    { q: "A foto fica salva?", a: "Não, a foto é usada só pra confirmar na hora e depois é descartada. Pode ficar tranquilo! 📸" },
-    { q: "Funciona em qualquer escola?", a: "Sim, basta criar uma conta com e-mail e senha e você organiza as matérias do seu jeito. 🏫" },
-    { q: "Tem versão para professores ou pais?", a: "Ainda não, mas em breve teremos novidades! 👀" }
-  ];
 
   return (
-    <div className="min-h-screen bg-surface font-sans text-on-surface overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--text-main)] font-sans overflow-x-hidden selection:bg-primary/30">
       
       {/* Navbar */}
-      <nav className="flex items-center justify-between p-4 max-w-5xl mx-auto opacity-0 animate-fade-in">
-        <div className="flex items-center gap-2">
-          <img src="/favicon.png" alt="Logo" className="w-8 h-8" />
-          <span className="font-bold text-lg tracking-tight">Homework Organizer</span>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-semibold tracking-tight">
+            <div className="w-5 h-5 rounded-sm bg-[var(--text-main)] flex items-center justify-center">
+              <span className="material-symbols-outlined text-[var(--background)] text-[14px]">bolt</span>
+            </div>
+            HW Tracker
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate('/login')} className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+              Log in
+            </button>
+            <button onClick={() => navigate('/login')} className="text-sm font-medium bg-[var(--text-main)] text-[var(--background)] px-3 py-1.5 rounded hover:opacity-90 transition-opacity">
+              Sign up
+            </button>
+          </div>
         </div>
-        <button 
-          onClick={() => navigate('/login')}
-          className="text-primary font-semibold hover:text-primary-hover transition-colors"
-        >
-          Entrar
-        </button>
       </nav>
 
-      {/* Hero Section */}
-      <header className="px-4 pt-12 pb-20 text-center max-w-5xl mx-auto flex flex-col items-center">
-        <RevealOnScroll delay={100}>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-on-surface mb-4 leading-tight">
-            Chega de enrolar com os deveres 📚
+      {/* Hero */}
+      <section className="relative pt-32 pb-24 px-6 flex flex-col items-center text-center">
+        {/* Glow behind hero */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] bg-secondary/10 blur-[80px] rounded-full pointer-events-none translate-x-20"></div>
+        
+        <RevealOnScroll>
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 max-w-4xl mx-auto leading-[1.1] relative z-10">
+            Linear for your <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+              studies.
+            </span>
           </h1>
         </RevealOnScroll>
-        <RevealOnScroll delay={200}>
-          <p className="text-lg md:text-xl text-on-surface-variant mb-8 max-w-2xl mx-auto">
-            Organize suas tarefas, prove que terminou tirando uma foto e acumule XP para manter sua ofensiva!
+        
+        <RevealOnScroll delay={100}>
+          <p className="text-lg md:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto font-light tracking-tight relative z-10">
+            A specialized issue tracker built for students. Plan tasks, verify completion with AI, and build an unbroken streak of productivity.
           </p>
         </RevealOnScroll>
-        <RevealOnScroll delay={300}>
-          <button 
-            onClick={() => navigate('/login')}
-            className="bg-primary text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all text-lg mb-10"
-          >
-            Começar agora — é grátis ✨
-          </button>
-        </RevealOnScroll>
         
-        {/* Mockup / Badge */}
-        <RevealOnScroll delay={400}>
-          <div className="relative w-full max-w-xs md:max-w-md mx-auto">
-            <div className="absolute -top-4 -right-4 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full shadow-md transform rotate-6 z-10">
-              PWA — Instale no celular! 📱
-            </div>
-            <div className="bg-white rounded-[2rem] border-8 border-surface-container-high shadow-2xl overflow-hidden aspect-[9/19] flex flex-col items-center justify-center relative">
-              {/* Fake App Screen */}
-              <div className="absolute top-0 w-full h-full bg-surface-container-low p-4 flex flex-col">
-                <div className="h-6 w-1/3 bg-surface-container-high rounded-full mb-6 mx-auto mt-2"></div>
-                <div className="bg-white p-4 rounded-2xl shadow-sm mb-4">
-                  <div className="h-4 w-1/2 bg-surface-container-high rounded-full mb-2"></div>
-                  <div className="h-3 w-1/3 bg-surface-container-high rounded-full"></div>
-                </div>
-                <div className="bg-white p-4 rounded-2xl shadow-sm mb-4">
-                  <div className="h-4 w-3/4 bg-surface-container-high rounded-full mb-2"></div>
-                  <div className="h-3 w-1/4 bg-surface-container-high rounded-full"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </RevealOnScroll>
-      </header>
-
-      {/* Funcionalidades */}
-      <section className="bg-surface-container-lowest py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <RevealOnScroll>
-            <h2 className="text-3xl font-bold text-center mb-12">Por que usar? 🤔</h2>
-          </RevealOnScroll>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <RevealOnScroll delay={100}>
-              <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow h-full">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4 text-primary">
-                  <span className="material-symbols-outlined text-2xl">edit_document</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">Organize seus deveres 📋</h3>
-                <p className="text-on-surface-variant">Cadastre matéria, prazo e prioridade em segundos.</p>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll delay={200}>
-              <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow h-full">
-                <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-4 text-secondary">
-                  <span className="material-symbols-outlined text-2xl">photo_camera</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">Prove que fez 📸</h3>
-                <p className="text-on-surface-variant">Tire uma foto do dever pronto pra confirmar de verdade.</p>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll delay={300}>
-              <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow h-full">
-                <div className="w-12 h-12 bg-tertiary/10 rounded-xl flex items-center justify-center mb-4 text-tertiary">
-                  <span className="material-symbols-outlined text-2xl">trophy</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">Ganhe XP 🏆</h3>
-                <p className="text-on-surface-variant">Acumule pontos e mantenha sua ofensiva em dia.</p>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll delay={400}>
-              <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow h-full">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4 text-primary">
-                  <span className="material-symbols-outlined text-2xl">notifications_active</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">Nunca esqueça 🔔</h3>
-                <p className="text-on-surface-variant">Filtre por hoje, essa semana ou todos os deveres.</p>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </div>
-      </section>
-
-      {/* Como Funciona */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <RevealOnScroll>
-            <h2 className="text-3xl font-bold text-center mb-16">Como Funciona 🚀</h2>
-          </RevealOnScroll>
-          <div className="flex flex-col md:flex-row gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-surface-container-high -z-10 -translate-y-1/2 rounded-full"></div>
-            
-            <div className="flex-1 flex flex-col items-center text-center">
-              <RevealOnScroll delay={100}>
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-6 border-4 border-surface shadow-md mx-auto">1</div>
-                <h3 className="text-xl font-bold mb-2">Cadastre seu dever</h3>
-                <p className="text-on-surface-variant">Informe a matéria, o que precisa ser feito e para quando é.</p>
-              </RevealOnScroll>
-            </div>
-            
-            <div className="flex-1 flex flex-col items-center text-center">
-              <RevealOnScroll delay={250}>
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-6 border-4 border-surface shadow-md mx-auto">2</div>
-                <h3 className="text-xl font-bold mb-2">Faça o dever e tire a foto</h3>
-                <p className="text-on-surface-variant">Terminou? Envie uma foto como prova definitiva de que está pronto!</p>
-              </RevealOnScroll>
-            </div>
-            
-            <div className="flex-1 flex flex-col items-center text-center">
-              <RevealOnScroll delay={400}>
-                <div className="w-16 h-16 rounded-full bg-secondary text-white flex items-center justify-center text-2xl font-bold mb-6 border-4 border-surface shadow-md mx-auto">3</div>
-                <h3 className="text-xl font-bold mb-2">Ganhe XP e continue</h3>
-                <p className="text-on-surface-variant">Aumente sua ofensiva e seja o mestre da organização! 🔥</p>
-              </RevealOnScroll>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Depoimentos */}
-      <section className="bg-primary text-white py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <RevealOnScroll>
-            <h2 className="text-3xl font-bold text-center mb-12">O que a galera tá achando 🗣️</h2>
-          </RevealOnScroll>
-          <div className="grid md:grid-cols-3 gap-6">
-            <RevealOnScroll delay={100}>
-              <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/20 h-full">
-                <div className="text-tertiary mb-3 flex gap-1">
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                </div>
-                <p className="text-lg italic mb-4">"Parei de esquecer os deveres de matemática!"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">J</div>
-                  <div>
-                    <p className="font-bold">João</p>
-                    <p className="text-sm opacity-80">8º ano</p>
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll delay={200}>
-              <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/20 h-full">
-                <div className="text-tertiary mb-3 flex gap-1">
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                </div>
-                <p className="text-lg italic mb-4">"A parte da foto é genial, não dá pra enganar!"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">A</div>
-                  <div>
-                    <p className="font-bold">Ana</p>
-                    <p className="text-sm opacity-80">1º ano do EM</p>
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-            <RevealOnScroll delay={300}>
-              <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/20 h-full">
-                <div className="text-tertiary mb-3 flex gap-1">
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                </div>
-                <p className="text-lg italic mb-4">"Minha mãe adorou que eu uso isso pra me organizar 😂"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">P</div>
-                  <div>
-                    <p className="font-bold">Pedro</p>
-                    <p className="text-sm opacity-80">7º ano</p>
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto">
-          <RevealOnScroll>
-            <h2 className="text-3xl font-bold text-center mb-10">Dúvidas Frequentes 🤷‍♂️</h2>
-          </RevealOnScroll>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <RevealOnScroll delay={index * 100} key={index}>
-                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden transition-all">
-                  <button 
-                    onClick={() => toggleFaq(index)}
-                    className="w-full px-6 py-4 flex items-center justify-between font-bold text-left hover:bg-surface-container-low transition-colors"
-                  >
-                    {faq.q}
-                    <span className={`material-symbols-outlined transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''}`}>
-                      expand_more
-                    </span>
-                  </button>
-                  <div 
-                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-40 py-4 border-t border-outline-variant' : 'max-h-0'}`}
-                  >
-                    <p className="text-on-surface-variant">{faq.a}</p>
-                  </div>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="bg-surface-container-lowest py-24 px-4 text-center">
-        <RevealOnScroll>
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-6">Pronto para virar o jogo? 🎮</h2>
-          <p className="text-xl text-on-surface-variant mb-10 max-w-2xl mx-auto">Junte-se à galera e nunca mais esqueça de um dever de casa.</p>
-        </RevealOnScroll>
         <RevealOnScroll delay={200}>
-          <button 
-            onClick={() => navigate('/login')}
-            className="bg-primary text-white font-bold py-4 px-10 rounded-full shadow-xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all text-xl"
-          >
-            Começar agora — é grátis ✨
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10">
+            <button 
+              onClick={() => navigate('/login')}
+              className="bg-[var(--text-main)] text-[var(--background)] h-12 px-8 rounded-full font-medium text-sm flex items-center gap-2 hover:scale-105 transition-transform"
+            >
+              Start tracking
+              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+          </div>
+        </RevealOnScroll>
+
+        {/* Dashboard Preview Mockup */}
+        <RevealOnScroll delay={400}>
+          <div className="mt-20 relative w-full max-w-5xl mx-auto">
+            <div className="absolute -inset-1 bg-gradient-to-b from-[var(--border)] to-transparent rounded-xl blur-sm opacity-50"></div>
+            <div className="relative rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden aspect-[16/9] shadow-2xl flex flex-col">
+              {/* Fake Window Controls */}
+              <div className="h-10 border-b border-[var(--border)] flex items-center px-4 gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#FF5F56]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#FFBD2E]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#27C93F]"></div>
+              </div>
+              <div className="flex-1 p-8 flex flex-col gap-4 opacity-50 select-none">
+                <div className="h-6 w-32 bg-[var(--border)] rounded"></div>
+                <div className="h-12 w-full bg-[var(--border)] rounded"></div>
+                <div className="h-12 w-full bg-[var(--border)] rounded"></div>
+                <div className="h-12 w-full bg-[var(--border)] rounded"></div>
+              </div>
+            </div>
+          </div>
         </RevealOnScroll>
       </section>
-      
+
+      {/* Features Bento */}
+      <section className="py-24 px-6 border-t border-[var(--border)] relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <RevealOnScroll>
+            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Built for execution.</h2>
+          </RevealOnScroll>
+          <div className="grid md:grid-cols-2 gap-4">
+            
+            <RevealOnScroll delay={100}>
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 h-[320px] flex flex-col hover:border-[var(--text-muted)] transition-colors group">
+                <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
+                  <span className="material-symbols-outlined text-[20px]">fact_check</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 tracking-tight">AI Verification</h3>
+                <p className="text-[var(--text-muted)] text-sm leading-relaxed">
+                  Upload a photo of your finished work. Our vision model instantly verifies the material, ensuring the issue can only be closed with undeniable proof.
+                </p>
+              </div>
+            </RevealOnScroll>
+
+            <RevealOnScroll delay={200}>
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 h-[320px] flex flex-col hover:border-[var(--text-muted)] transition-colors group">
+                <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
+                  <span className="material-symbols-outlined text-[20px]">bolt</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 tracking-tight">Keyboard First</h3>
+                <p className="text-[var(--text-muted)] text-sm leading-relaxed">
+                  Navigate, create, and resolve issues at the speed of thought. The interface stays out of your way so you can focus on getting the work done.
+                </p>
+              </div>
+            </RevealOnScroll>
+
+            <RevealOnScroll delay={300}>
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 h-[320px] flex flex-col md:col-span-2 hover:border-[var(--text-muted)] transition-colors group relative overflow-hidden">
+                <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none"></div>
+                <div className="relative z-10 w-full md:w-1/2">
+                  <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center mb-6 group-hover:bg-[var(--text-main)] group-hover:text-[var(--background)] transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">timeline</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 tracking-tight">Metrics that matter</h3>
+                  <p className="text-[var(--text-muted)] text-sm leading-relaxed">
+                    Track your velocity over time. Maintain streaks and earn XP in a sophisticated environment that treats your studies like professional projects, not toys.
+                  </p>
+                </div>
+              </div>
+            </RevealOnScroll>
+
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="py-8 text-center text-on-surface-variant text-sm border-t border-outline-variant">
-        <p>© {new Date().getFullYear()} Homework Organizer. Feito para estudantes.</p>
+      <footer className="border-t border-[var(--border)] py-12 text-center">
+        <div className="flex items-center justify-center gap-2 font-semibold tracking-tight text-[var(--text-muted)] mb-2">
+          <div className="w-4 h-4 rounded-sm bg-[var(--text-muted)] flex items-center justify-center">
+            <span className="material-symbols-outlined text-[var(--background)] text-[12px]">bolt</span>
+          </div>
+          HW Tracker
+        </div>
+        <p className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-widest">
+          © {new Date().getFullYear()} Issue Tracking for Students
+        </p>
       </footer>
     </div>
   );

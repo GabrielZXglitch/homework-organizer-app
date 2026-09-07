@@ -1,199 +1,133 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Login() {
-  const { currentUser, loginWithEmail, registerWithEmail, loginWithGoogle } = useAuth();
+  const { loginWithEmail, loginWithGoogle, registerWithEmail, loading } = useAuth();
   const navigate = useNavigate();
   
-  useEffect(() => {
-    if (currentUser) {
-      navigate('/app');
-    }
-  }, [currentUser, navigate]);
-  
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [nome, setNome] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
+    setError(null);
     try {
-      if (isRegistering) {
-        await registerWithEmail(nome, email, password);
+      if (isLogin) {
+        await loginWithEmail(email, senha);
+        navigate('/app');
       } else {
-        await loginWithEmail(email, password);
+        if (!nome) return;
+        await registerWithEmail(nome, email, senha);
+        navigate('/app');
       }
-      navigate('/app');
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Ocorreu um erro.');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Ocorreu um erro');
     }
   };
 
   const handleGoogle = async () => {
-    setLoading(true);
+    setError(null);
     try {
       await loginWithGoogle();
       navigate('/app');
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Erro ao entrar com Google.');
-      setLoading(false);
+      setError(err.message || 'Erro ao fazer login com Google');
     }
-  }
+  };
 
   return (
-    <main className="flex-1 flex flex-col relative w-full px-4 sm:px-6 md:max-w-md md:mx-auto bg-surface min-h-screen">
-      <div className="flex flex-col w-full pb-8 pt-6">
-        
-        {/* Minimal App Logo */}
-        <div className="pt-6 pb-4 flex flex-col items-center justify-center">
-          <div className="w-14 h-14 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-3">
-            <span className="material-symbols-outlined text-3xl">auto_stories</span>
+    <main className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-10">
+          <div className="w-10 h-10 mx-auto rounded bg-[var(--text-main)] flex items-center justify-center mb-6">
+            <span className="material-symbols-outlined text-[var(--background)] text-[24px]">bolt</span>
           </div>
-          <span className="font-label-md text-label-md text-outline uppercase tracking-wider">Homework Organizer</span>
-        </div>
-
-        {/* Header */}
-        <div className="text-center px-2 mb-8">
-          <h1 className="text-2xl font-bold text-on-surface mb-2 tracking-tight">
-            {isRegistering ? 'Crie sua conta' : 'Bem-vindo de volta'}
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-main)]">
+            {isLogin ? 'Welcome back' : 'Create your account'}
           </h1>
-          <p className="text-base text-on-surface-variant">
-            {isRegistering ? 'Organize sua vida acadêmica' : 'Organize seus deveres e tarefas escolares'}
+          <p className="text-[var(--text-muted)] text-sm mt-2">
+            {isLogin ? 'Enter your details to access your issues.' : 'Start tracking your studies today.'}
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-xl text-sm">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded text-sm mb-6 font-medium">
             {error}
           </div>
         )}
 
-        {/* Form */}
-        <form className="flex flex-col w-full gap-4" onSubmit={handleSubmit}>
-          
-          {isRegistering && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {!isLogin && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="nome-input">Nome Completo</label>
-              <div className="relative flex items-center">
-                <span className="material-symbols-outlined absolute left-3.5 text-outline text-xl pointer-events-none">person</span>
-                <input 
-                  className="w-full h-12 bg-surface-container-low text-on-surface text-base placeholder:text-outline rounded-xl pl-11 pr-4 outline-none transition-colors focus:bg-surface-container-high" 
-                  id="nome-input" 
-                  placeholder="Seu nome" 
-                  required={isRegistering} 
-                  type="text"
-                  value={nome}
-                  onChange={e => setNome(e.target.value)}
-                />
-              </div>
+              <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Full Name</label>
+              <input 
+                className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
+                type="text" 
+                required 
+                value={nome}
+                onChange={e => setNome(e.target.value)}
+              />
             </div>
           )}
-
+          
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-on-surface" htmlFor="email-input">E-mail</label>
-            <div className="relative flex items-center">
-              <span className="material-symbols-outlined absolute left-3.5 text-outline text-xl pointer-events-none">mail</span>
-              <input 
-                className="w-full h-12 bg-surface-container-low text-on-surface text-base placeholder:text-outline rounded-xl pl-11 pr-4 outline-none transition-colors focus:bg-surface-container-high" 
-                id="email-input" 
-                placeholder="seuemail@gmail.com" 
-                required 
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
+            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Email</label>
+            <input 
+              className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
+              type="email" 
+              required 
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
           </div>
-
+          
           <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="password-input">Senha</label>
-              {!isRegistering && (
-                <button className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors py-1" type="button">
-                  Esqueceu a senha?
-                </button>
-              )}
-            </div>
-            <div className="relative flex items-center">
-              <span className="material-symbols-outlined absolute left-3.5 text-outline text-xl pointer-events-none">lock</span>
-              <input 
-                className="w-full h-12 bg-surface-container-low text-on-surface text-base placeholder:text-outline rounded-xl pl-11 pr-12 outline-none transition-colors focus:bg-surface-container-high" 
-                id="password-input" 
-                placeholder="••••••••" 
-                required 
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-              <button 
-                className="absolute right-1 w-11 h-11 flex items-center justify-center text-outline hover:text-on-surface transition-colors" 
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <span className="material-symbols-outlined text-xl">
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </span>
-              </button>
-            </div>
+            <label className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">Password</label>
+            <input 
+              className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] rounded px-3 text-sm focus:outline-none focus:border-[var(--text-main)] transition-colors" 
+              type="password" 
+              required 
+              value={senha}
+              onChange={e => setSenha(e.target.value)}
+            />
           </div>
 
-          <div className="pt-3">
-            <button 
-              className="w-full h-12 bg-primary text-on-primary font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-hover active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
-              ) : (
-                <>
-                  <span>{isRegistering ? 'Criar Conta' : 'Entrar'}</span>
-                  <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full h-10 bg-[var(--text-main)] text-[var(--background)] font-medium text-sm rounded mt-2 hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50"
+          >
+            {loading ? <span className="material-symbols-outlined animate-spin text-[18px]">sync</span> : (isLogin ? 'Continue' : 'Sign up')}
+          </button>
         </form>
 
-        {/* Divider */}
-        <div className="relative my-7 flex items-center justify-center">
-          <div className="w-full h-px bg-surface-container-high"></div>
-          <span className="absolute bg-surface px-3 text-xs font-semibold text-outline uppercase tracking-wider">ou acesse com</span>
+        <div className="relative flex items-center py-6">
+          <div className="flex-grow border-t border-[var(--border)]"></div>
+          <span className="flex-shrink-0 mx-4 text-[10px] font-mono uppercase text-[var(--text-muted)]">Or</span>
+          <div className="flex-grow border-t border-[var(--border)]"></div>
         </div>
 
         <button 
+          type="button"
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full h-12 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface flex items-center justify-center gap-2 text-base font-semibold transition-colors disabled:opacity-50" 
-          type="button"
+          className="w-full h-10 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] font-medium text-sm rounded hover:bg-[var(--surface-hover)] transition-colors flex items-center justify-center gap-2"
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-          <span>Continuar com Google</span>
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+          Continue with Google
         </button>
 
-        {/* Toggle Mode */}
-        <div className="mt-8 text-center flex items-center justify-center gap-1.5">
-          <span className="text-sm text-on-surface-variant">
-            {isRegistering ? 'Já tem uma conta?' : 'Ainda não tem uma conta?'}
-          </span>
+        <div className="mt-8 text-center">
           <button 
-            onClick={() => setIsRegistering(!isRegistering)}
-            className="text-sm font-semibold text-primary hover:text-primary-hover transition-colors" 
             type="button"
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-[var(--text-muted)] hover:text-[var(--text-main)] text-sm transition-colors"
           >
-            {isRegistering ? 'Entrar' : 'Criar conta'}
+            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
           </button>
         </div>
       </div>

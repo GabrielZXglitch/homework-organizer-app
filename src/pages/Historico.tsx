@@ -1,82 +1,79 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Timestamp } from 'firebase/firestore';
 
 export function Historico() {
-  const { userProfile, logout } = useAuth();
   const { homeworks, loading } = useHomeworks();
+  
+  const [filter, setFilter] = useState<'mes' | 'todos'>('mes');
+  
+  const completedHomeworks = homeworks.filter(hw => hw.status === 'concluido');
+  
+  // Aqui faríamos a filtragem real por data se necessário
+  const displayed = completedHomeworks;
 
-  const completedHomeworks = homeworks.filter(hw => hw.status === 'concluido').sort((a, b) => {
-    const da = a.dataConclusao instanceof Timestamp ? a.dataConclusao.toMillis() : (a.dataConclusao as Date)?.getTime() || 0;
-    const dbTime = b.dataConclusao instanceof Timestamp ? b.dataConclusao.toMillis() : (b.dataConclusao as Date)?.getTime() || 0;
-    return dbTime - da; // desc
-  });
-
-  const formatData = (dateValue: Timestamp | Date | null) => {
-    if (!dateValue) return '';
+  const formatDate = (dateValue: Timestamp | Date) => {
     const d = dateValue instanceof Timestamp ? dateValue.toDate() : dateValue;
-    return format(d, "dd 'de' MMM, yyyy", { locale: ptBR });
+    return format(d, "dd MMM yyyy, HH:mm", { locale: ptBR });
   };
 
   return (
-    <main className="flex-1 flex flex-col relative w-full px-4 md:max-w-md md:mx-auto pb-24 bg-surface min-h-screen">
-      <div className="pt-6 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-on-surface tracking-tight">Histórico</h1>
-        <button onClick={logout} className="p-2 text-error hover:bg-error/10 rounded-full transition-colors flex items-center justify-center">
-          <span className="material-symbols-outlined">logout</span>
-        </button>
-      </div>
-
-      <div className="bg-surface-container-low p-4 rounded-2xl mb-6 mt-2 flex justify-around">
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold text-primary">{completedHomeworks.length}</span>
-          <span className="text-xs text-on-surface-variant uppercase font-semibold">Concluídos</span>
+    <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
+      <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
+        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">History</span>
         </div>
-        <div className="w-px bg-outline-variant"></div>
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold text-secondary">{userProfile?.xpTotal || 0}</span>
-          <span className="text-xs text-on-surface-variant uppercase font-semibold">XP Total</span>
-        </div>
-      </div>
+      </header>
 
-      <section className="flex flex-col gap-3">
-        {loading ? (
-          <div className="py-8 text-center"><span className="material-symbols-outlined animate-spin text-2xl text-primary">progress_activity</span></div>
-        ) : completedHomeworks.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-3xl text-outline">history</span>
+      <div className="px-5 pb-24 flex flex-col md:max-w-2xl md:mx-auto w-full mt-6">
+        <h1 className="text-[var(--text-main)] text-2xl font-bold tracking-tight mb-6">
+          Resolved Issues
+        </h1>
+
+        <div className="flex items-center gap-4 mb-6">
+          <button 
+            onClick={() => setFilter('mes')}
+            className={`text-sm font-medium transition-colors pb-1 border-b-2 ${filter === 'mes' ? 'text-[var(--text-main)] border-[var(--text-main)]' : 'text-[var(--text-muted)] border-transparent'}`}
+          >
+            This Month
+          </button>
+          <button 
+            onClick={() => setFilter('todos')}
+            className={`text-sm font-medium transition-colors pb-1 border-b-2 ${filter === 'todos' ? 'text-[var(--text-main)] border-[var(--text-main)]' : 'text-[var(--text-muted)] border-transparent'}`}
+          >
+            All Time
+          </button>
+        </div>
+
+        <section className="flex flex-col gap-[1px] bg-[var(--border)] rounded-lg overflow-hidden border border-[var(--border)]">
+          {loading ? (
+             <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Loading history...</div>
+          ) : displayed.length === 0 ? (
+            <div className="bg-[var(--surface)] p-12 text-center">
+              <span className="material-symbols-outlined text-[var(--text-muted)] text-3xl mb-2">history</span>
+              <p className="text-[var(--text-main)] text-sm font-medium">No resolved issues yet</p>
             </div>
-            <p className="text-base font-semibold text-on-surface">Nenhum histórico</p>
-            <p className="text-sm text-on-surface-variant mt-1">Os deveres que você concluir aparecerão aqui.</p>
-          </div>
-        ) : (
-          completedHomeworks.map(hw => (
-            <article key={hw.id} className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm opacity-75">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary">
-                  <span className="material-symbols-outlined text-[18px]">check</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-semibold text-on-surface line-clamp-1 line-through">
-                    {hw.titulo}
-                  </h3>
-                  <div className="flex items-center gap-1 mt-1 text-xs text-on-surface-variant">
-                    <span>{hw.materia}</span>
-                    <span>•</span>
-                    <span>{formatData(hw.dataConclusao)}</span>
+          ) : (
+            displayed.map(hw => (
+              <article key={hw.id} className="bg-[var(--surface)] p-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+                  <div className="min-w-0 flex flex-col">
+                    <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase truncate">{hw.materia}</span>
+                    <h3 className="text-sm font-medium text-[var(--text-main)] truncate">{hw.titulo}</h3>
                   </div>
                 </div>
-                <div className="flex-shrink-0 flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg">
-                  <span className="text-xs font-bold text-primary">+{hw.xpGanho} XP</span>
+                <div className="flex flex-col items-end shrink-0">
+                  <span className="text-[10px] font-mono text-[var(--text-muted)]">Completed</span>
+                  <span className="text-xs text-[var(--text-main)]">{formatDate(hw.dataConclusao || hw.prazo)}</span>
                 </div>
-              </div>
-            </article>
-          ))
-        )}
-      </section>
+              </article>
+            ))
+          )}
+        </section>
+      </div>
     </main>
   );
 }

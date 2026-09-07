@@ -1,11 +1,29 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHomeworks } from '../contexts/HomeworkContext';
-import { filterHomeworksByPeriod } from '../utils/gamification';
 import { useNavigate } from 'react-router-dom';
+import { Timestamp } from 'firebase/firestore';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Timestamp } from 'firebase/firestore';
+
+const filterHomeworksByPeriod = (hws: any[], filter: string) => {
+  const now = new Date();
+  if (filter === 'hoje') {
+    return hws.filter(hw => {
+      const d = hw.prazo instanceof Timestamp ? hw.prazo.toDate() : hw.prazo;
+      return isToday(d);
+    });
+  }
+  if (filter === 'semana') {
+    return hws.filter(hw => {
+      const d = hw.prazo instanceof Timestamp ? hw.prazo.toDate() : hw.prazo;
+      const diffTime = Math.abs(d.getTime() - now.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      return diffDays <= 7;
+    });
+  }
+  return hws;
+};
 
 export function Home() {
   const { userProfile, currentUser } = useAuth();
@@ -20,60 +38,55 @@ export function Home() {
     const d = dateValue instanceof Timestamp ? dateValue.toDate() : dateValue;
     if (isToday(d)) return `Hoje, ${format(d, 'HH:mm')}`;
     if (isTomorrow(d)) return `Amanhã, ${format(d, 'HH:mm')}`;
-    return format(d, "EEEE, HH:mm", { locale: ptBR });
+    return format(d, "dd MMM, HH:mm", { locale: ptBR });
   };
 
-  const subjectConfig: Record<string, { icon: string, bg: string, text: string }> = {
-    'Matemática': { icon: '➗', bg: 'bg-primary-container', text: 'text-on-primary' },
-    'Física': { icon: '⚛️', bg: 'bg-primary-container', text: 'text-on-primary' },
-    'Biologia': { icon: '🧬', bg: 'bg-secondary-container', text: 'text-on-secondary-container' },
-    'História': { icon: '🏛️', bg: 'bg-[#FEE2E2]', text: 'text-[#991B1B]' },
-    'Português': { icon: '📚', bg: 'bg-surface-container-high', text: 'text-on-surface-variant' },
-  };
+  const getSubjectInitials = (subject: string) => subject.substring(0, 2).toUpperCase();
 
   return (
-    <main className="flex-1 flex flex-col relative w-full px-4 md:max-w-md md:mx-auto pb-24 bg-surface min-h-screen">
-      {/* Gamification Top Bar */}
-      <div className="pt-6 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center border-2 border-primary overflow-hidden shrink-0">
-            <span className="material-symbols-outlined text-outline text-2xl">person</span>
+    <main className="flex-1 flex flex-col relative w-full px-5 md:max-w-2xl md:mx-auto pb-24 min-h-screen bg-[var(--background)] animate-fade-in">
+      
+      {/* Header & Stats - Sleek / Linear Vibe */}
+      <header className="pt-10 pb-6 flex items-end justify-between border-b border-[var(--border)]">
+        <div>
+          <h2 className="text-[var(--text-muted)] text-xs font-mono tracking-wider uppercase mb-1">
+            {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'User'}
+          </h2>
+          <h1 className="text-[var(--text-main)] text-2xl font-bold tracking-tight">
+            Active Issues
+          </h1>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex flex-col items-end">
+            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Streak</span>
+            <span className="text-[var(--text-main)] text-sm font-semibold flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+              {userProfile?.streakDias || 0}
+            </span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-on-surface">Olá, {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'} 👋</span>
-            <span className="text-xs text-on-surface-variant font-medium">Bora devorar esses deveres!</span>
+          <div className="flex flex-col items-end">
+            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Experience</span>
+            <span className="text-primary text-sm font-semibold flex items-center gap-1">
+              {userProfile?.xpTotal || 0} XP
+            </span>
           </div>
         </div>
-        <div className="flex gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-low rounded-xl">
-            <span className="material-symbols-outlined text-tertiary text-lg" style={{fontVariationSettings: "'FILL' 1"}}>local_fire_department</span>
-            <span className="text-sm font-bold text-on-surface">{userProfile?.streakDias || 0}</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-low rounded-xl">
-            <span className="material-symbols-outlined text-primary text-lg" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-            <span className="text-sm font-bold text-on-surface">{userProfile?.xpTotal || 0} XP</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 mb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-on-surface tracking-tight">Meus Deveres</h1>
-      </div>
+      </header>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex items-center gap-4 mt-6 mb-8 overflow-x-auto no-scrollbar">
         {[
-          { id: 'hoje', label: 'Hoje' },
-          { id: 'semana', label: 'Esta Semana' },
-          { id: 'todos', label: 'Todos' }
+          { id: 'hoje', label: 'Today' },
+          { id: 'semana', label: 'This Week' },
+          { id: 'todos', label: 'All' }
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setFilter(tab.id as any)}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm transition-all ${
+            className={`flex-shrink-0 text-sm font-medium transition-colors pb-1 border-b-2 ${
               filter === tab.id 
-                ? 'bg-primary text-on-primary font-bold shadow-sm'
-                : 'bg-surface-container-low text-on-surface-variant font-semibold hover:bg-surface-container'
+                ? 'text-[var(--text-main)] border-[var(--text-main)]'
+                : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-main)]'
             }`}
           >
             {tab.label}
@@ -82,68 +95,64 @@ export function Home() {
       </div>
 
       {/* Task List */}
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-[1px] bg-[var(--border)] rounded-lg overflow-hidden border border-[var(--border)]">
         {loading ? (
-          <div className="py-8 text-center"><span className="material-symbols-outlined animate-spin text-2xl text-primary">progress_activity</span></div>
+          <div className="bg-[var(--surface)] p-8 text-center text-[var(--text-muted)] font-mono text-sm">Loading issues...</div>
         ) : displayedHomeworks.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-3xl text-outline">check_circle</span>
+          <div className="bg-[var(--surface)] py-12 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-[var(--text-muted)]">done_all</span>
             </div>
-            <p className="text-base font-semibold text-on-surface">Tudo limpo!</p>
-            <p className="text-sm text-on-surface-variant mt-1">Você não tem deveres para este período.</p>
+            <p className="text-sm font-medium text-[var(--text-main)]">No active issues</p>
+            <p className="text-xs text-[var(--text-muted)] mt-1">Inbox zero achieved.</p>
           </div>
         ) : (
-          displayedHomeworks.map(hw => {
-            const config = subjectConfig[hw.materia] || { icon: '📝', bg: 'bg-surface-container-high', text: 'text-on-surface-variant' };
-            return (
-              <article key={hw.id} className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm transition-all duration-300">
-                <div className="flex items-start gap-3">
-                  <button 
-                    onClick={() => navigate(`/app/concluir/${hw.id}`)}
-                    className="flex-shrink-0 w-6 h-6 rounded-full bg-surface-container-low flex items-center justify-center transition-all mt-0.5 hover:bg-secondary/20"
-                  >
-                    <span className="material-symbols-outlined text-[16px] text-transparent check-icon transition-colors">check</span>
-                  </button>
-                  <div className="flex-1 min-w-0" onClick={() => navigate(`/app/concluir/${hw.id}`)}>
-                    <div className="flex items-center justify-between gap-1 mb-1.5 cursor-pointer">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
-                        <span className="text-[13px]">{config.icon}</span>
-                        <span>{hw.materia}</span>
-                      </span>
-                      <span className={`text-xs font-semibold ${hw.prioridade === 'urgente' ? 'text-tertiary' : 'text-on-surface-variant'}`}>
-                        {hw.prioridade.charAt(0).toUpperCase() + hw.prioridade.slice(1)}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-semibold text-on-surface line-clamp-2 cursor-pointer">
-                      {hw.titulo}
-                    </h3>
-                    <div className="flex flex-wrap items-center justify-between gap-y-2 mt-3 pt-2">
-                      <div className="flex items-center gap-1 text-on-surface-variant text-sm">
-                        <span className="material-symbols-outlined text-[16px]">calendar_today</span>
-                        <span className="capitalize">{formatPrazo(hw.prazo)}</span>
-                      </div>
-                      {hw.exigeFoto && (
-                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface-container-low text-primary text-xs font-semibold">
-                          <span className="material-symbols-outlined text-[16px]" style={{fontVariationSettings: "'FILL' 1"}}>photo_camera</span>
-                          <span>Comprovante</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+          displayedHomeworks.map(hw => (
+            <article 
+              key={hw.id} 
+              onClick={() => navigate(`/app/concluir/${hw.id}`)}
+              className="bg-[var(--surface)] hover:bg-[var(--surface-hover)] p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer transition-colors group"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {/* Checkbox Placeholder */}
+                <div className="flex-shrink-0 w-4 h-4 rounded-sm border border-[var(--text-muted)] group-hover:border-primary transition-colors flex items-center justify-center"></div>
+                
+                {/* ID & Title */}
+                <div className="flex-1 min-w-0 flex items-baseline gap-2">
+                  <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase shrink-0">
+                    {getSubjectInitials(hw.materia)}-{hw.id.substring(0,4)}
+                  </span>
+                  <h3 className="text-sm font-medium text-[var(--text-main)] truncate">
+                    {hw.titulo}
+                  </h3>
                 </div>
-              </article>
-            );
-          })
+              </div>
+
+              {/* Metadata */}
+              <div className="flex items-center gap-4 ml-7 sm:ml-0 shrink-0">
+                {hw.prioridade === 'urgente' && (
+                  <span className="text-[10px] uppercase font-mono text-[#F87171] bg-[#F87171]/10 px-1.5 py-0.5 rounded">Urgente</span>
+                )}
+                {hw.exigeFoto && (
+                  <span className="material-symbols-outlined text-[14px] text-[var(--text-muted)]">photo_camera</span>
+                )}
+                <span className="text-xs font-mono text-[var(--text-muted)] w-24 text-right">
+                  {formatPrazo(hw.prazo)}
+                </span>
+              </div>
+            </article>
+          ))
         )}
       </section>
 
-      <aside className="fixed bottom-[5.25rem] right-4 md:right-auto md:left-1/2 md:ml-[160px] z-40">
+      {/* FAB - Re-styled as a primary action button, more Vercel-like */}
+      <aside className="fixed bottom-6 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40">
         <button 
           onClick={() => navigate('/app/novo')}
-          className="w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
         >
-          <span className="material-symbols-outlined text-[28px]">add</span>
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          New Issue
         </button>
       </aside>
     </main>

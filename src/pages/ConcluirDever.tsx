@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
 
 export function ConcluirDever() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { homeworks, completeHomework } = useHomeworks();
   
@@ -14,9 +14,7 @@ export function ConcluirDever() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!hw) {
-      navigate('/app');
-    }
+    if (!hw) navigate('/app');
   }, [hw, navigate]);
 
   if (!hw) return null;
@@ -26,9 +24,7 @@ export function ConcluirDever() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (evt) => {
-        if (evt.target?.result) {
-          setPhotoData(evt.target.result as string);
-        }
+        if (evt.target?.result) setPhotoData(evt.target.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -36,13 +32,12 @@ export function ConcluirDever() {
 
   const handleConfirm = async () => {
     if (hw.exigeFoto && !photoData) {
-      alert("É necessário anexar uma foto como comprovante.");
+      alert("Comprovante visual exigido.");
       return;
     }
 
     setIsSubmitting(true);
     
-    // Validação com API do Backend (Groq)
     if (photoData) {
       try {
         const base64Data = photoData.split(',')[1];
@@ -54,58 +49,59 @@ export function ConcluirDever() {
           body: JSON.stringify({ base64Data, mimeType })
         });
         
-        if (!response.ok) {
-          throw new Error('Erro na API de verificação');
-        }
+        if (!response.ok) throw new Error('Network error');
 
         const { aprovado } = await response.json();
         
         if (!aprovado) {
-          alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
+          alert('Validação falhou. Certifique-se de que a imagem contenha material de estudo válido.');
           setIsSubmitting(false);
           return;
         }
       } catch (error) {
-        console.error("Erro ao verificar foto com Backend:", error);
-        alert('Ocorreu um erro ao validar sua foto. Tente novamente.');
+        console.error("Verification error:", error);
+        alert('Erro ao validar imagem.');
         setIsSubmitting(false);
         return;
       }
     }
 
     confetti({
-      particleCount: 100,
-      spread: 70,
+      particleCount: 80,
+      spread: 60,
       origin: { y: 0.6 },
-      colors: ['#10B981', '#4F46E5', '#F59E0B']
+      colors: ['#4F46E5', '#10B981', '#FFFFFF']
     });
 
     await completeHomework(hw.id, !!photoData);
     
     setTimeout(() => {
       navigate('/app');
-    }, 1500);
+    }, 1000);
   };
 
   return (
-    <main className="flex-1 flex flex-col relative w-full bg-surface min-h-screen">
-      <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md pt-safe">
-        <div className="h-16 px-4 flex items-center justify-between md:max-w-md md:mx-auto">
+    <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
+      <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
+        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
           <button 
             type="button" 
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors"
+            className="flex items-center gap-1 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
-            <span className="material-symbols-outlined text-2xl">close</span>
+            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            Back
           </button>
-          <span className="text-base font-bold text-on-surface flex-1 text-center pr-10">Concluir Dever</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Resolve Issue</span>
         </div>
       </header>
 
-      <div className="px-4 pb-12 flex flex-col md:max-w-md md:mx-auto w-full gap-6 mt-2">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-on-surface mb-1">{hw.titulo}</h2>
-          <p className="text-sm font-semibold text-on-surface-variant">Matéria: {hw.materia}</p>
+      <div className="px-5 pb-12 flex flex-col md:max-w-2xl md:mx-auto w-full gap-8 mt-8">
+        <div>
+          <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] tracking-wider">
+            {hw.materia}
+          </span>
+          <h2 className="text-2xl font-semibold text-[var(--text-main)] mt-1 tracking-tight leading-snug">{hw.titulo}</h2>
         </div>
 
         {hw.exigeFoto ? (
@@ -122,74 +118,49 @@ export function ConcluirDever() {
             <button 
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl group"
+              className="w-full relative overflow-hidden focus:outline-none rounded-lg group text-left"
             >
               {!photoData ? (
-                <div className="w-full h-80 rounded-2xl bg-surface-container-lowest flex flex-col items-center justify-center p-6 shadow-sm transition-all duration-200 group-active:bg-surface-container-low border border-dashed border-outline-variant">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4 transition-transform group-hover:scale-105">
-                    <span className="material-symbols-outlined text-[40px]">photo_camera</span>
-                  </div>
-                  <p className="text-sm font-semibold text-on-surface text-center max-w-[240px]">
-                    Toque para abrir a câmera ou escolher da galeria
-                  </p>
-                  <p className="text-sm text-on-surface-variant text-center mt-2">
-                    Formatos aceitos: JPG, PNG ou HEIC
-                  </p>
+                <div className="w-full aspect-[4/3] rounded-lg bg-[var(--surface)] flex flex-col items-center justify-center p-6 border border-dashed border-[var(--border)] hover:border-primary/50 transition-colors">
+                  <span className="material-symbols-outlined text-[32px] text-[var(--text-muted)] mb-3 group-hover:text-primary transition-colors">add_photo_alternate</span>
+                  <p className="text-sm font-medium text-[var(--text-main)]">Upload Proof</p>
+                  <p className="text-[10px] font-mono text-[var(--text-muted)] uppercase mt-2">Required</p>
                 </div>
               ) : (
-                <div className="w-full h-80 rounded-2xl bg-surface-container-lowest shadow-sm overflow-hidden relative">
+                <div className="w-full aspect-[4/3] rounded-lg shadow-sm overflow-hidden relative border border-[var(--border)]">
                   <img className="w-full h-full object-cover" src={photoData} alt="Preview" />
-                  <div className="absolute inset-0 bg-on-surface/20"></div>
-                  <div className="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                    <span className="material-symbols-outlined text-secondary text-[16px]">check_circle</span>
-                    <span className="text-xs font-semibold text-on-surface">Foto anexada</span>
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-sm font-medium">Replace Image</span>
+                  </div>
+                  <div className="absolute top-3 right-3 bg-secondary/90 backdrop-blur-md px-2 py-1 rounded flex items-center gap-1 shadow-sm">
+                    <span className="material-symbols-outlined text-white text-[14px]">done</span>
+                    <span className="text-[10px] font-mono uppercase text-white">Attached</span>
                   </div>
                 </div>
               )}
             </button>
           </div>
         ) : (
-          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-              <span className="material-symbols-outlined text-3xl">task</span>
+          <div className="bg-[var(--surface)] p-6 rounded-lg border border-[var(--border)] flex items-start gap-3">
+            <span className="material-symbols-outlined text-[var(--text-muted)]">info</span>
+            <div>
+              <p className="text-sm font-medium text-[var(--text-main)]">No visual proof required.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">You can mark this issue as resolved immediately.</p>
             </div>
-            <p className="text-sm font-semibold text-on-surface">Este dever não exige comprovação com foto.</p>
-            <p className="text-sm text-on-surface-variant mt-1">Clique em Confirmar para finalizá-lo.</p>
           </div>
         )}
 
-        <div className="flex flex-col gap-3 mt-4">
+        <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[var(--border)]">
           <button 
-            className="w-full h-12 bg-secondary hover:bg-success-active active:bg-success-active text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm disabled:opacity-50" 
+            className="w-full h-11 bg-[var(--text-main)] text-[var(--background)] font-medium text-sm rounded-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 shadow-glow-subtle" 
             onClick={handleConfirm} 
             disabled={isSubmitting || (hw.exigeFoto && !photoData)}
           >
             {isSubmitting ? (
-              <span className="material-symbols-outlined text-[22px] animate-spin">progress_activity</span>
-            ) : (
-              <span className="material-symbols-outlined text-[22px]">check_circle</span>
-            )}
-            <span>{isSubmitting ? 'Validando...' : 'Confirmar conclusão'}</span>
+              <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+            ) : null}
+            <span>{isSubmitting ? 'Validating...' : 'Mark as Resolved'}</span>
           </button>
-          
-          {hw.exigeFoto && photoData && !isSubmitting && (
-            <button 
-              className="w-full h-12 bg-surface-container-lowest active:bg-surface-container text-on-surface-variant font-bold rounded-xl flex items-center justify-center gap-1 transition-colors shadow-sm" 
-              onClick={() => fileInputRef.current?.click()} 
-            >
-              <span className="material-symbols-outlined text-[18px]">replay</span>
-              <span>Tirar outra foto</span>
-            </button>
-          )}
-          
-          {!isSubmitting && (
-            <button 
-              className="w-full h-12 bg-transparent text-outline hover:text-on-surface active:bg-surface-container-low font-bold rounded-xl flex items-center justify-center transition-colors" 
-              onClick={() => navigate(-1)}
-            >
-              Cancelar
-            </button>
-          )}
         </div>
       </div>
     </main>

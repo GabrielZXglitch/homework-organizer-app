@@ -1,174 +1,186 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HomeworkPriority } from '../types';
 import { useHomeworks } from '../contexts/HomeworkContext';
-import { Timestamp } from 'firebase/firestore';
-import type { HomeworkPriority, SubjectOption } from '../types';
-import { parse } from 'date-fns';
-
-const initialSubjects: SubjectOption[] = [
-  { label: 'Matemática', color: 'bg-primary', textColor: 'text-on-primary', icon: 'functions' },
-  { label: 'Física', color: 'bg-primary', textColor: 'text-on-primary', icon: 'speed' },
-  { label: 'Biologia', color: 'bg-primary', textColor: 'text-on-primary', icon: 'biotech' },
-  { label: 'História', color: 'bg-primary', textColor: 'text-on-primary', icon: 'account_balance' },
-  { label: 'Português', color: 'bg-primary', textColor: 'text-on-primary', icon: 'book' },
-];
+import { format, startOfTomorrow } from 'date-fns';
 
 export function NovoDever() {
   const navigate = useNavigate();
   const { addHomework } = useHomeworks();
   
-  const [subjects, setSubjects] = useState(initialSubjects);
-  const [selectedSubject, setSelectedSubject] = useState('Matemática');
-  
   const [titulo, setTitulo] = useState('');
+  const [materia, setMateria] = useState('Matemática');
   const [descricao, setDescricao] = useState('');
-  
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0];
-  const [dueDate, setDueDate] = useState(dateStr);
+  const [prioridade, setPrioridade] = useState<HomeworkPriority>('tranquilo');
+  const [dueDate, setDueDate] = useState(() => format(startOfTomorrow(), 'yyyy-MM-dd'));
   const [dueTime, setDueTime] = useState('23:59');
-  
-  const [prioridade, setPrioridade] = useState<HomeworkPriority>('importante');
   const [exigeFoto, setExigeFoto] = useState(true);
-  
   const [saving, setSaving] = useState(false);
 
+  const [isAddingSubject, setIsAddingSubject] = useState(false);
+  const [newSubject, setNewSubject] = useState('');
+  const [customSubjects, setCustomSubjects] = useState<string[]>([]);
+
+  const defaultSubjects = [
+    { id: 'Matemática', label: 'Math' },
+    { id: 'História', label: 'History' },
+    { id: 'Ciências', label: 'Science' },
+    { id: 'Português', label: 'Language' },
+    { id: 'Inglês', label: 'English' }
+  ];
+
+  const allSubjects = [
+    ...defaultSubjects,
+    ...customSubjects.map(s => ({ id: s, label: s }))
+  ];
+
   const handleAddSubject = () => {
-    const nome = prompt('Nova matéria:');
-    if (nome && nome.trim()) {
-      const newSubj: SubjectOption = { label: nome.trim(), color: 'bg-primary', textColor: 'text-on-primary', icon: 'bookmark' };
-      setSubjects([...subjects, newSubj]);
-      setSelectedSubject(nome.trim());
+    if (newSubject && !allSubjects.find(s => s.id === newSubject)) {
+      setCustomSubjects([...customSubjects, newSubject]);
+      setMateria(newSubject);
     }
+    setNewSubject('');
+    setIsAddingSubject(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!titulo || !selectedSubject || !dueDate || !dueTime) return;
+    if (!titulo.trim() || !dueDate || !dueTime) return;
+
     setSaving(true);
-    
     try {
-      const dateString = `${dueDate} ${dueTime}`;
-      const parsedDate = parse(dateString, 'yyyy-MM-dd HH:mm', new Date());
-      
+      const [year, month, day] = dueDate.split('-').map(Number);
+      const [hour, minute] = dueTime.split(':').map(Number);
+      const prazo = new Date(year, month - 1, day, hour, minute);
+
       await addHomework({
-        materia: selectedSubject,
-        titulo,
-        descricao,
-        prazo: Timestamp.fromDate(parsedDate),
+        titulo: titulo.trim(),
+        materia,
+        descricao: descricao.trim(),
+        prazo,
         prioridade,
-        exigeFoto
+        exigeFoto,
       });
+
       navigate('/app');
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao salvar.');
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao salvar. Tente novamente.');
+    } finally {
       setSaving(false);
     }
   };
 
   return (
-    <main className="flex-1 flex flex-col relative w-full bg-surface min-h-screen">
-      {/* App Bar */}
-      <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md pt-safe">
-        <div className="h-16 px-4 flex items-center justify-between md:max-w-md md:mx-auto">
+    <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
+      <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
+        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
           <button 
             type="button" 
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors"
+            onClick={() => navigate('/app')}
+            className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
-            <span className="material-symbols-outlined text-2xl">arrow_back</span>
+            Cancel
           </button>
-          <span className="text-base font-bold text-on-surface flex-1 text-center pr-10">Novo Dever</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">New Issue</span>
+          <button 
+            onClick={handleSubmit}
+            disabled={saving || !titulo.trim()}
+            className="text-primary hover:text-primary-hover disabled:text-[var(--text-muted)] transition-colors text-sm font-medium"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </header>
 
-      <div className="px-4 pb-28 flex flex-col md:max-w-md md:mx-auto w-full">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 mt-4 w-full">
+      <div className="px-5 pb-32 flex flex-col md:max-w-2xl md:mx-auto w-full mt-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           
-          {/* Matéria */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-on-surface">Matéria</label>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-              {subjects.map(s => (
-                <button
-                  key={s.label}
-                  type="button"
-                  onClick={() => setSelectedSubject(s.label)}
-                  className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    selectedSubject === s.label 
-                      ? 'bg-primary text-on-primary' 
-                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[18px]">{s.icon}</span>
-                  <span>{s.label}</span>
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={handleAddSubject}
-                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold border-2 border-dashed border-outline-variant text-outline hover:border-outline hover:text-on-surface transition-all"
-              >
-                <span className="material-symbols-outlined text-[18px]">add</span>
-                <span>Nova</span>
-              </button>
-            </div>
-          </div>
-
           {/* Título */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-on-surface" htmlFor="hwTitle">Título da tarefa</label>
+          <div>
             <input 
-              className="w-full h-12 bg-surface-container-lowest text-on-surface placeholder:text-outline rounded-xl px-4 text-base shadow-sm focus:outline-none focus:bg-surface-container-low transition-all" 
+              className="w-full bg-transparent text-[var(--text-main)] placeholder:text-[var(--text-muted)] text-3xl font-semibold tracking-tight focus:outline-none" 
               id="hwTitle" 
-              placeholder="Ex: Exercícios de Álgebra Linear" 
+              placeholder="Issue Title" 
               required 
               type="text"
               value={titulo}
               onChange={e => setTitulo(e.target.value)}
+              autoFocus
             />
           </div>
 
           {/* Descrição */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="hwDesc">Descrição detalhada</label>
-              <span className="text-xs font-semibold text-outline">Opcional</span>
-            </div>
+          <div className="border-b border-[var(--border)] pb-6">
             <textarea 
-              className="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline rounded-xl p-4 text-base shadow-sm focus:outline-none focus:bg-surface-container-low resize-none transition-all" 
+              className="w-full bg-transparent text-[var(--text-muted)] focus:text-[var(--text-main)] placeholder:text-[var(--text-muted)]/50 text-sm focus:outline-none resize-none transition-colors leading-relaxed" 
               id="hwDesc" 
-              placeholder="Descreva a atividade..." 
+              placeholder="Add description..." 
               rows={3}
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
             />
           </div>
 
-          {/* Prazo */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="dueDate">Data de entrega</label>
-              <div className="relative flex items-center bg-surface-container-lowest rounded-xl shadow-sm focus-within:bg-surface-container-low transition-all">
-                <span className="material-symbols-outlined absolute left-3 text-primary text-[20px] pointer-events-none">calendar_today</span>
+          {/* Controls Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+            
+            {/* Project / Subject */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Project</label>
+              <div className="flex flex-wrap gap-2">
+                {allSubjects.map(s => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setMateria(s.id)}
+                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors border ${
+                      materia === s.id 
+                        ? 'border-[var(--text-main)] text-[var(--background)] bg-[var(--text-main)]'
+                        : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-muted)]'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+                {!isAddingSubject ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingSubject(true)}
+                    className="px-3 py-1.5 rounded border border-dashed border-[var(--border)] text-[var(--text-muted)] text-xs font-medium hover:border-[var(--text-muted)] transition-colors flex items-center"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">add</span>
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <input 
+                      type="text"
+                      className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text-main)] text-xs w-24 focus:outline-none focus:border-primary"
+                      autoFocus
+                      placeholder="Name"
+                      value={newSubject}
+                      onChange={e => setNewSubject(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSubject())}
+                    />
+                    <button type="button" onClick={handleAddSubject} className="text-primary material-symbols-outlined text-[16px]">check</button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Prazo */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Due Date</label>
+              <div className="flex gap-2">
                 <input 
-                  className="w-full h-12 bg-transparent text-on-surface pl-10 pr-3 text-sm focus:outline-none" 
-                  id="dueDate" 
+                  className="bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] px-3 py-1.5 rounded text-sm focus:outline-none focus:border-primary flex-1" 
                   type="date" 
                   required
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
                 />
-              </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-on-surface" htmlFor="dueTime">Horário limite</label>
-              <div className="relative flex items-center bg-surface-container-lowest rounded-xl shadow-sm focus-within:bg-surface-container-low transition-all">
-                <span className="material-symbols-outlined absolute left-3 text-primary text-[20px] pointer-events-none">schedule</span>
                 <input 
-                  className="w-full h-12 bg-transparent text-on-surface pl-10 pr-3 text-sm focus:outline-none" 
-                  id="dueTime" 
+                  className="bg-[var(--surface)] border border-[var(--border)] text-[var(--text-main)] px-3 py-1.5 rounded text-sm focus:outline-none focus:border-primary w-24" 
                   type="time" 
                   required
                   value={dueTime}
@@ -176,73 +188,47 @@ export function NovoDever() {
                 />
               </div>
             </div>
-          </div>
 
-          {/* Prioridade */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-on-surface">Prioridade</label>
-            <div className="grid grid-cols-3 gap-2 bg-surface-container-low p-1.5 rounded-xl">
-              {[
-                { value: 'tranquilo', color: 'bg-secondary', text: 'text-secondary', label: 'Tranquilo' },
-                { value: 'importante', color: 'bg-[#F59E0B]', text: 'text-[#B45309]', label: 'Importante' },
-                { value: 'urgente', color: 'bg-[#EF4444]', text: 'text-[#B91C1C]', label: 'Urgente' }
-              ].map(opt => (
-                <label key={opt.value} className="cursor-pointer">
-                  <input 
-                    className="peer sr-only" 
-                    name="priority" 
-                    type="radio" 
-                    value={opt.value}
-                    checked={prioridade === opt.value}
-                    onChange={() => setPrioridade(opt.value as HomeworkPriority)}
-                  />
-                  <div className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-lg text-on-surface-variant text-sm font-semibold peer-checked:bg-surface-container-lowest peer-checked:${opt.text} peer-checked:shadow-sm transition-all text-center`}>
-                    <span className={`w-2 h-2 rounded-full ${opt.color}`}></span>
-                    <span>{opt.label}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Foto Checkbox */}
-          <div 
-            className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm flex items-center justify-between gap-4 cursor-pointer select-none"
-            onClick={() => setExigeFoto(!exigeFoto)}
-          >
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                <span className="material-symbols-outlined text-[22px]">photo_camera</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-on-surface truncate">Comprovação com Foto</span>
-                <span className="text-xs text-outline truncate">Anexar imagem ao dar como concluído</span>
+            {/* Prioridade */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-mono uppercase text-[var(--text-muted)]">Priority</label>
+              <div className="flex bg-[var(--surface)] border border-[var(--border)] rounded p-1">
+                {[
+                  { value: 'tranquilo', label: 'Low' },
+                  { value: 'importante', label: 'Medium' },
+                  { value: 'urgente', label: 'High' }
+                ].map(opt => (
+                  <label key={opt.value} className="flex-1 cursor-pointer">
+                    <input 
+                      className="peer sr-only" 
+                      name="priority" 
+                      type="radio" 
+                      value={opt.value}
+                      checked={prioridade === opt.value}
+                      onChange={() => setPrioridade(opt.value as HomeworkPriority)}
+                    />
+                    <div className="text-center py-1 rounded text-xs font-medium text-[var(--text-muted)] peer-checked:text-[var(--text-main)] peer-checked:bg-[var(--surface-hover)] transition-colors">
+                      {opt.label}
+                    </div>
+                  </label>
+                ))}
               </div>
             </div>
-            <div className="relative flex-shrink-0">
-              <input checked={exigeFoto} onChange={() => {}} className="sr-only peer" type="checkbox"/>
-              <div className="w-12 h-6 bg-surface-container-high rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </div>
-          </div>
 
-          {/* FAB Fixed */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-surface/90 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.05)] z-40">
-            <div className="md:max-w-md md:mx-auto">
-              <button 
-                type="submit" 
-                disabled={saving}
-                className="w-full h-12 bg-primary hover:bg-primary-hover text-on-primary text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-md disabled:opacity-50 transition-all"
-              >
-                {saving ? (
-                  <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[20px]">check_circle</span>
-                    <span>Salvar Dever</span>
-                  </>
-                )}
-              </button>
+            {/* Foto Checkbox */}
+            <div className="flex flex-col justify-center">
+              <label className="flex items-center gap-3 cursor-pointer group mt-4 sm:mt-0 p-3 rounded border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--text-muted)] transition-colors">
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-medium text-[var(--text-main)] block">Visual Proof</span>
+                  <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] block mt-0.5">Require photo</span>
+                </div>
+                <div className="relative">
+                  <input checked={exigeFoto} onChange={(e) => setExigeFoto(e.target.checked)} className="sr-only peer" type="checkbox"/>
+                  <div className="w-9 h-5 bg-[var(--border)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--text-main)] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </div>
+              </label>
             </div>
+
           </div>
         </form>
       </div>
