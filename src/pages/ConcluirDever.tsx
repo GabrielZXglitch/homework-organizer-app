@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 
 export function ConcluirDever() {
   const { id } = useParams<{ id: string }>();
@@ -53,38 +55,27 @@ export function ConcluirDever() {
           const base64Data = photoData.split(',')[1];
           const mimeType = photoData.split(';')[0].split(':')[1];
           
-          const model = 'gemini-1.5-flash';
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  { text: "Você é um assistente verificador de deveres de casa. Analise esta imagem e determine se é uma foto legítima de um dever de casa, anotações de aula, livro didático, material de estudo escolar/universitário, ou um estudante fazendo lição. Responda APENAS com a palavra 'SIM' se for válido ou 'NAO' se for uma foto inválida (ex: uma selfie aleatória, foto de comida, paisagem, etc)." },
-                  {
-                    inlineData: {
-                      mimeType: mimeType,
-                      data: base64Data
-                    }
-                  }
-                ]
-              }],
-              generationConfig: {
-                temperature: 0.1,
-                maxOutputTokens: 10,
-              }
-            })
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 10,
+            }
           });
 
-          if (!response.ok) {
-            throw new Error(`Erro na API do Gemini: ${response.status} - ${response.statusText}`);
-          }
+          const promptText = "Você é um assistente verificador de deveres de casa. Analise esta imagem e determine se é uma foto legítima de um dever de casa, anotações de aula, livro didático, material de estudo escolar/universitário, ou um estudante fazendo lição. Responda APENAS com a palavra 'SIM' se for válido ou 'NAO' se for uma foto inválida (ex: uma selfie aleatória, foto de comida, paisagem, etc).";
+          
+          const imagePart = {
+            inlineData: {
+              data: base64Data,
+              mimeType: mimeType
+            }
+          };
 
-          const data = await response.json();
-          const respostaGemini = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || '';
+          const result = await model.generateContent([promptText, imagePart]);
+          const response = await result.response;
+          const respostaGemini = response.text().trim().toUpperCase();
           
           if (!respostaGemini.includes('SIM')) {
             alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
