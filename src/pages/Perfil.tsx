@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { db } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 
 export function Perfil() {
