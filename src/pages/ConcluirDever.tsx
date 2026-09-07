@@ -2,8 +2,36 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
+const verifyPhotoWithGemini = async (photoData: string): Promise<boolean> => {
+  const base64Data = photoData.split(',')[1];
+  const mimeType = photoData.split(';')[0].split(':')[1];
+  
+  const response = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_GEMINI_API_KEY}`
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: "Analise esta imagem. Responda APENAS com SIM se mostrar dever de casa, caderno, folha de exercícios ou material escolar. Responda APENAS com NAO para qualquer outra coisa." },
+            { inline_data: { mime_type: mimeType, data: base64Data } }
+          ]
+        }]
+      })
+    }
+  );
+
+  if (!response.ok) throw new Error(`Erro: ${response.status}`);
+  
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase() || 'NAO';
+  return text.includes('SIM');
+};
 
 export function ConcluirDever() {
   const { id } = useParams<{ id: string }>();
@@ -52,32 +80,9 @@ export function ConcluirDever() {
           console.warn("VITE_GEMINI_API_KEY não está configurada, pulando validação de IA.");
           await new Promise(resolve => setTimeout(resolve, 800));
         } else {
-          const base64Data = photoData.split(',')[1];
-          const mimeType = photoData.split(';')[0].split(':')[1];
+          const isPhotoValid = await verifyPhotoWithGemini(photoData);
           
-          const genAI = new GoogleGenerativeAI(apiKey);
-          const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
-            generationConfig: {
-              temperature: 0.1,
-              maxOutputTokens: 10,
-            }
-          });
-
-          const promptText = "Você é um assistente verificador de deveres de casa. Analise esta imagem e determine se é uma foto legítima de um dever de casa, anotações de aula, livro didático, material de estudo escolar/universitário, ou um estudante fazendo lição. Responda APENAS com a palavra 'SIM' se for válido ou 'NAO' se for uma foto inválida (ex: uma selfie aleatória, foto de comida, paisagem, etc).";
-          
-          const imagePart = {
-            inlineData: {
-              data: base64Data,
-              mimeType: mimeType
-            }
-          };
-
-          const result = await model.generateContent([promptText, imagePart]);
-          const response = await result.response;
-          const respostaGemini = response.text().trim().toUpperCase();
-          
-          if (!respostaGemini.includes('SIM')) {
+          if (!isPhotoValid) {
             alert('A foto enviada não parece ser um dever de casa válido. Por favor, tire uma foto mais clara do seu material de estudo.');
             setIsSubmitting(false);
             return;
@@ -85,8 +90,6 @@ export function ConcluirDever() {
         }
       } catch (error) {
         console.error("Erro ao verificar foto com Gemini:", error);
-        // Se a API falhar, podemos aceitar por precaução ou pedir pra tentar de novo
-        // Aqui optamos por alertar e abortar, mas pode ser ajustado
         alert('Ocorreu um erro ao validar sua foto. Verifique a chave de API e tente novamente.');
         setIsSubmitting(false);
         return;
