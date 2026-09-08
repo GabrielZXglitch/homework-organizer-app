@@ -18,13 +18,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         role: 'user',
         content: [
           { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } },
-          { type: 'text', text: 'Analise esta imagem. Responda APENAS com SIM se mostrar qualquer coisa relacionada a estudo ou escola: caderno, livro, livro didático, folha de papel com escrita, exercício, apostila, prova, anotações, texto impresso ou manuscrito, material escolar, tablet ou computador com conteúdo educacional. Responda APENAS com NAO apenas se for claramente uma foto sem nenhuma relação com estudo, como: parede, comida, selfie, paisagem, objeto doméstico, móvel, eletrodoméstico ou climatizador. Em caso de dúvida, responda SIM.' }
+          { type: 'text', text: 'Look at this image. Reply ONLY with YES if you can see any of the following: handwritten text, printed text, a notebook, a book, paper with writing, a school worksheet, a textbook, or any study material. Reply ONLY with NO if the image shows clearly non-study content like food, a person\'s face, furniture, appliances, walls, or outdoor scenes. When in doubt, reply YES.' }
         ]
       }]
     })
   });
 
   const data = await response.json();
-  const text = data.choices?.[0]?.message?.content?.trim().toUpperCase() || 'NAO';
-  res.json({ aprovado: text.includes('SIM') });
+  const text = data.choices?.[0]?.message?.content?.trim().toUpperCase() || 'NO';
+  res.json({ aprovado: text.includes('YES') });
 }
