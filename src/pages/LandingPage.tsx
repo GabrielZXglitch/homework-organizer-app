@@ -75,7 +75,7 @@ export function LandingPage() {
           <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 max-w-4xl mx-auto leading-[1.1] relative z-10">
             Chega de enrolar com os <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              deveres 📚
+              deveres.
             </span>
           </h1>
         </RevealOnScroll>
@@ -103,7 +103,7 @@ export function LandingPage() {
       <section className="py-24 px-6 relative z-10">
         <div className="max-w-6xl mx-auto">
           <RevealOnScroll>
-            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">O que a galera tá achando 🗣️</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">O que a galera tá achando.</h2>
           </RevealOnScroll>
           <div className="grid md:grid-cols-3 gap-6">
             <RevealOnScroll delay={100}>
@@ -171,7 +171,7 @@ export function LandingPage() {
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <RevealOnScroll>
-            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Dúvidas Frequentes 🤷‍♂️</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-12 text-center">Dúvidas Frequentes.</h2>
           </RevealOnScroll>
           <div className="space-y-4">
             {faqs.map((faq, index) => (
