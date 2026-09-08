@@ -43,9 +43,7 @@ export function Login() {
     <main className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <div className="w-10 h-10 mx-auto rounded bg-[var(--text-main)] flex items-center justify-center mb-6">
-            <span className="material-symbols-outlined text-[var(--background)] text-[24px]">bolt</span>
-          </div>
+          <img src="/logo.png" alt="Logo" className="w-12 h-12 mx-auto rounded object-contain bg-white mb-6" />
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-main)]">
             {isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}
           </h1>
