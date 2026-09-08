@@ -46,12 +46,15 @@ function AppRoutes() {
   );
 }
 
+import { InstallPWA } from './components/InstallPWA';
+
 export default function App() {
   return (
     <AuthProvider>
       <HomeworkProvider>
         <BrowserRouter>
           <AppRoutes />
+          <InstallPWA />
         </BrowserRouter>
       </HomeworkProvider>
     </AuthProvider>

@@ -51,8 +51,8 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-semibold tracking-tight">
-            <img src="/logo.png" alt="Logo" className="w-5 h-5 rounded-sm object-contain bg-white" />
+          <div className="flex items-center gap-3 font-semibold tracking-tight text-lg">
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             Homework Organizer
           </div>
           <div className="flex items-center gap-4">
@@ -201,7 +201,7 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] py-12 text-center">
         <div className="flex items-center justify-center gap-2 font-semibold tracking-tight text-[var(--text-muted)] mb-2">
-          <img src="/logo.png" alt="Logo" className="w-4 h-4 rounded-sm object-contain bg-white opacity-50" />
+          <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain opacity-50 grayscale" />
           Homework Organizer
         </div>
         <p className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-widest">
