@@ -5,6 +5,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { base64Data, mimeType } = req.body;
 
+  console.log(`Diagnostic [Groq Request]:`);
+  console.log(`- Base64 Size: ${base64Data?.length || 0} caracteres`);
+  console.log(`- Base64 Preview (100 chars): ${base64Data?.substring(0, 100) || 'N/A'}`);
+  console.log(`- MimeType: ${mimeType}`);
+
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -25,6 +30,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
 
   const data = await response.json();
+  
+  if (!response.ok) {
+    console.error(`Groq API Error: ${response.status} ${response.statusText}`);
+    console.error(`Groq Error Body:`, JSON.stringify(data, null, 2));
+  }
+
   const text = data.choices?.[0]?.message?.content?.trim().toUpperCase() || 'NO';
   res.json({ aprovado: text.includes('YES') });
 }
