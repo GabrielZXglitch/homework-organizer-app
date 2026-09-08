@@ -17,13 +17,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: 'qwen/qwen3.8-27b',
       max_tokens: 10,
       messages: [{
         role: 'user',
         content: [
           { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } },
-          { type: 'text', text: 'Look at this image. Reply ONLY with YES if you can see any of the following: handwritten text, printed text, a notebook, a book, paper with writing, a school worksheet, a textbook, or any study material. Reply ONLY with NO if the image shows clearly non-study content like food, a person\'s face, furniture, appliances, walls, or outdoor scenes. When in doubt, reply YES.' }
+          { type: 'text', text: 'You are a homework verification assistant. Look at this image carefully. Reply ONLY with YES if the image shows any study material: handwritten notes, a notebook, paper with text, a textbook, printed text, school exercises, or any written content. Reply ONLY with NO if the image shows only non-study objects like walls, furniture, food, appliances, people, or outdoor scenes. Any image with visible text or writing should be YES.' }
         ]
       }]
     })
