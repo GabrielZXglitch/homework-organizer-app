@@ -36,7 +36,7 @@ export function LandingPage() {
     { q: "Precisa instalar?", a: "Não, roda no navegador. Mas pode instalar como PWA no celular." },
     { q: "A foto fica salva?", a: "Não, a foto é usada só pra confirmar na hora e descartada." },
     { q: "Funciona em qualquer escola?", a: "Sim, basta criar uma conta com e-mail e senha." },
-    { q: "Tem versão para professores ou pais?", a: "Ainda não, mas em breve!" }
+    { q: "A confirmação com foto aceita qualquer imagem?", a: "Não — o app usa inteligência artificial para verificar se a foto é de um material de estudo real (caderno, livro, folha de exercícios). Fotos de objetos aleatórios são rejeitadas automaticamente." }
   ];
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
