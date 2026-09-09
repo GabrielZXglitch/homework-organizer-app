@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
+const RevealOnScroll = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,7 @@ const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, de
     <div 
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
     >
       {children}
     </div>
@@ -76,7 +76,7 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-24 px-6 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
+      <section className="relative pt-24 pb-12 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
         <div className="absolute top-1/2 left-1/2 md:left-1/3 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/2 md:left-1/3 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] bg-secondary/10 blur-[80px] rounded-full pointer-events-none translate-x-20"></div>
         
@@ -109,15 +109,13 @@ export function LandingPage() {
           </RevealOnScroll>
         </div>
 
-        <div className="flex-1 w-full flex justify-center md:justify-end relative z-10 mt-12 md:mt-0">
-          <RevealOnScroll delay={300}>
-            <img 
-              src="/mockup.png" 
-              alt="App Mockup" 
-              className="w-full h-auto object-contain md:max-w-[600px]"
-            />
-          </RevealOnScroll>
-        </div>
+        <RevealOnScroll delay={300} className="flex-[1.5] w-full flex justify-center md:justify-end relative z-10 mt-4 md:mt-0">
+          <img 
+            src="/mockup.png" 
+            alt="App Mockup" 
+            className="block w-full h-auto object-contain md:max-w-[800px]"
+          />
+        </RevealOnScroll>
       </section>
 
       {/* Testimonials */}
