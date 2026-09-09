@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed', platform: string }>;
@@ -52,14 +53,18 @@ export function InstallPWA() {
       }
       setDeferredPrompt(null);
     }
-    
     setShowPrompt(false);
   };
-
+    
   const handleDismiss = () => {
     localStorage.setItem('pwa-prompt-dismissed', 'true');
     setShowPrompt(false);
   };
+
+  const { currentUser } = useAuth();
+  const location = useLocation();
+
+  if (!currentUser || !location.pathname.startsWith('/app')) return null;
 
   const needsNotification = 'Notification' in window && Notification.permission === 'default';
 
@@ -70,7 +75,7 @@ export function InstallPWA() {
       <div className="flex items-center gap-4">
         <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain flex-shrink-0" />
         <p className="text-[var(--text-main)] font-medium text-sm leading-snug">
-          Instale o app e ative as notificações para não esquecer nenhum dever!
+          Instale o app e ative as notificações para a experiência completa!
         </p>
       </div>
       <div className="flex gap-2 w-full mt-1">
