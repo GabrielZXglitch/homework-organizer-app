@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://homework-organizer.vercel.app/sitemap.xml
