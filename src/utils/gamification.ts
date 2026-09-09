@@ -60,14 +60,47 @@ export interface Achievement {
 }
 
 export function getAchievements(xpTotal: number, streakDias: number, completedCount: number): Achievement[] {
+  const level = calculateLevel(xpTotal).level;
+  
   return [
+    // --- TAREFAS (TASKS) ---
     {
-      id: 'first_task',
+      id: 'task_1',
       name: 'Primeiro Passo',
       description: 'Concluiu sua primeira tarefa.',
       icon: 'star',
       unlocked: completedCount >= 1
     },
+    {
+      id: 'task_10',
+      name: 'Focado',
+      description: 'Concluiu 10 tarefas no total.',
+      icon: 'school',
+      unlocked: completedCount >= 10
+    },
+    {
+      id: 'task_50',
+      name: 'Mestre da Rotina',
+      description: 'Concluiu 50 tarefas no total.',
+      icon: 'military_tech',
+      unlocked: completedCount >= 50
+    },
+    {
+      id: 'task_100',
+      name: 'Máquina de Estudar',
+      description: 'Concluiu 100 tarefas no total.',
+      icon: 'robot_2',
+      unlocked: completedCount >= 100
+    },
+    {
+      id: 'task_500',
+      name: 'Super Estudante',
+      description: 'Concluiu impressionantes 500 tarefas.',
+      icon: 'diamond',
+      unlocked: completedCount >= 500
+    },
+    
+    // --- OFENSIVAS (STREAKS) ---
     {
       id: 'streak_3',
       name: 'Pegando o Ritmo',
@@ -77,31 +110,68 @@ export function getAchievements(xpTotal: number, streakDias: number, completedCo
     },
     {
       id: 'streak_7',
-      name: 'Imparável',
-      description: 'Atingiu 7 dias de ofensiva.',
+      name: 'Semana Perfeita',
+      description: 'Atingiu 7 dias de ofensiva sem parar.',
       icon: 'whatshot',
       unlocked: streakDias >= 7
     },
     {
-      id: 'tasks_10',
-      name: 'Focado',
-      description: 'Concluiu 10 tarefas no total.',
-      icon: 'school',
-      unlocked: completedCount >= 10
+      id: 'streak_14',
+      name: 'Imparável',
+      description: 'Atingiu 14 dias de ofensiva (2 semanas).',
+      icon: 'electric_bolt',
+      unlocked: streakDias >= 14
     },
     {
-      id: 'tasks_50',
-      name: 'Mestre',
-      description: 'Concluiu 50 tarefas no total.',
-      icon: 'military_tech',
-      unlocked: completedCount >= 50
+      id: 'streak_30',
+      name: 'Hábito de Ferro',
+      description: 'Atingiu 30 dias de ofensiva.',
+      icon: 'fitness_center',
+      unlocked: streakDias >= 30
+    },
+    {
+      id: 'streak_100',
+      name: 'Deus da Disciplina',
+      description: 'Um verdadeiro monge. 100 dias de ofensiva.',
+      icon: 'self_improvement',
+      unlocked: streakDias >= 100
+    },
+
+    // --- NÍVEIS (LEVELS) ---
+    {
+      id: 'level_5',
+      name: 'Iniciante Curioso',
+      description: 'Alcançou o Nível 5.',
+      icon: 'emoji_events',
+      unlocked: level >= 5
     },
     {
       id: 'level_10',
-      name: 'Lenda Viva',
+      name: 'Lenda Urbana',
       description: 'Chegou ao Nível 10.',
       icon: 'workspace_premium',
-      unlocked: calculateLevel(xpTotal).level >= 10
+      unlocked: level >= 10
+    },
+    {
+      id: 'level_25',
+      name: 'Veterano',
+      description: 'Chegou ao Nível 25.',
+      icon: 'verified',
+      unlocked: level >= 25
+    },
+    {
+      id: 'level_50',
+      name: 'Mito',
+      description: 'Atingiu o prestigiado Nível 50.',
+      icon: 'stars',
+      unlocked: level >= 50
+    },
+    {
+      id: 'level_100',
+      name: 'Divindade Acadêmica',
+      description: 'O inimaginável: Nível 100.',
+      icon: 'cruelty_free',
+      unlocked: level >= 100
     }
   ];
 }
