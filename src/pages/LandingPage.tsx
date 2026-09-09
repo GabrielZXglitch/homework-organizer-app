@@ -113,7 +113,7 @@ export function LandingPage() {
           <img 
             src="/mockup.png" 
             alt="App Mockup" 
-            style={{ width: '100%', maxWidth: '700px', height: 'auto', display: 'block', margin: '0 auto' }}
+            style={{ width: '90%', maxWidth: '580px', height: 'auto', display: 'block', margin: '0 auto' }}
           />
         </RevealOnScroll>
       </section>
