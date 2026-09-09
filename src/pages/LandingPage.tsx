@@ -203,7 +203,12 @@ export function LandingPage() {
       <footer className="border-t border-[var(--border)] py-12 text-center">
         <div className="flex items-center justify-center gap-2 font-semibold tracking-tight text-[var(--text-muted)] mb-2">
           <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain opacity-50 grayscale" />
-          Homework Organizer
+          <span>
+            Homework Organizer by{' '}
+            <a href="https://zxlabs.online/" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-main)] transition-colors">
+              ZX Labs
+            </a>
+          </span>
         </div>
         <p className="text-[12px] font-mono text-[var(--text-muted)] uppercase tracking-widest">
           © {new Date().getFullYear()}
