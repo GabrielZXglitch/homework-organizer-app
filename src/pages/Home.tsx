@@ -55,12 +55,14 @@ export function Home() {
   };
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const justLongPressed = useRef(false);
 
   const handleTouchStart = (id: string) => {
     if (isSelectionMode) return;
     longPressTimer.current = setTimeout(() => {
       setIsSelectionMode(true);
       setSelectedIds(new Set([id]));
+      justLongPressed.current = true;
       if (window.navigator.vibrate) window.navigator.vibrate(50);
     }, 500);
   };
@@ -74,6 +76,11 @@ export function Home() {
   };
 
   const handleCardClick = (id: string) => {
+    if (justLongPressed.current) {
+      justLongPressed.current = false;
+      return;
+    }
+    
     if (isSelectionMode) {
       const next = new Set(selectedIds);
       if (next.has(id)) next.delete(id);
