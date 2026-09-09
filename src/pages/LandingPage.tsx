@@ -76,36 +76,48 @@ export function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-24 px-6 flex flex-col items-center text-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] bg-secondary/10 blur-[80px] rounded-full pointer-events-none translate-x-20"></div>
+      <section className="relative pt-32 pb-24 px-6 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
+        <div className="absolute top-1/2 left-1/2 md:left-1/3 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 md:left-1/3 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] bg-secondary/10 blur-[80px] rounded-full pointer-events-none translate-x-20"></div>
         
-        <RevealOnScroll>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 max-w-4xl mx-auto leading-[1.1] relative z-10">
-            Chega de enrolar com os <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              deveres.
-            </span>
-          </h1>
-        </RevealOnScroll>
-        
-        <RevealOnScroll delay={100}>
-          <p className="text-lg md:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto font-light tracking-tight relative z-10">
-            Organize seus deveres escolares, comprove que fez com uma foto e ganhe XP a cada dever concluído.
-          </p>
-        </RevealOnScroll>
-        
-        <RevealOnScroll delay={200}>
-          <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10">
-            <button 
-              onClick={() => navigate('/login')}
-              className="bg-[var(--text-main)] text-[var(--background)] h-12 px-8 rounded-full font-medium text-sm flex items-center gap-2 hover:scale-105 transition-transform"
-            >
-              Começar a usar
-              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </button>
-          </div>
-        </RevealOnScroll>
+        <div className="flex-1 flex flex-col items-center md:items-start relative z-10 w-full">
+          <RevealOnScroll>
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-6 max-w-4xl mx-auto md:mx-0 leading-[1.1]">
+              Chega de enrolar com os <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                deveres.
+              </span>
+            </h1>
+          </RevealOnScroll>
+          
+          <RevealOnScroll delay={100}>
+            <p className="text-lg md:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto md:mx-0 font-light tracking-tight">
+              Organize seus deveres escolares, comprove que fez com uma foto e ganhe XP a cada dever concluído.
+            </p>
+          </RevealOnScroll>
+          
+          <RevealOnScroll delay={200}>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <button 
+                onClick={() => navigate('/login')}
+                className="bg-[var(--text-main)] text-[var(--background)] h-12 px-8 rounded-full font-medium text-sm flex items-center gap-2 hover:scale-105 transition-transform"
+              >
+                Começar a usar
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </div>
+          </RevealOnScroll>
+        </div>
+
+        <div className="flex-1 w-full flex justify-center md:justify-end relative z-10 mt-12 md:mt-0">
+          <RevealOnScroll delay={300}>
+            <img 
+              src="/mockup.png" 
+              alt="App Mockup" 
+              className="w-full h-auto object-contain md:max-w-[600px]"
+            />
+          </RevealOnScroll>
+        </div>
       </section>
 
       {/* Testimonials */}
