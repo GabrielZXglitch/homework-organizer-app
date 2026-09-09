@@ -59,10 +59,14 @@ export interface Achievement {
   unlocked: boolean;
 }
 
-export function getAchievements(xpTotal: number, streakDias: number, completedCount: number): Achievement[] {
+export function getAchievements(xpTotal: number, streakDias: number, completedCount: number, pwaInstalled: boolean, notificationsEnabled: boolean): Achievement[] {
   const level = calculateLevel(xpTotal).level;
   
   return [
+    // --- EXTRAS (2) ---
+    { id: 'pwa_installed', name: 'App no Bolso', description: 'Instalou o app na tela inicial.', icon: 'install_mobile', unlocked: pwaInstalled },
+    { id: 'notifications_on', name: 'Sempre Alerta', description: 'Ativou as notificações para os deveres.', icon: 'notifications_active', unlocked: notificationsEnabled },
+
     // --- TAREFAS (11) ---
     { id: 'task_1', name: 'Primeiro Passo', description: 'Concluiu sua primeira tarefa.', icon: 'star', unlocked: completedCount >= 1 },
     { id: 'task_5', name: 'Aprendiz', description: 'Concluiu 5 tarefas.', icon: 'child_care', unlocked: completedCount >= 5 },

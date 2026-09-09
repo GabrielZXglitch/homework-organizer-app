@@ -35,16 +35,24 @@ export function InstallPWA() {
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+    // Request notification permission first
+    if ('Notification' in window && Notification.permission === 'default') {
+      try {
+        await Notification.requestPermission();
+      } catch (e) {
+        console.error("Erro ao pedir notificação", e);
+      }
+    }
+
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      }
+      setDeferredPrompt(null);
     }
     
-    setDeferredPrompt(null);
     setShowPrompt(false);
   };
 
@@ -53,14 +61,16 @@ export function InstallPWA() {
     setShowPrompt(false);
   };
 
-  if (!showPrompt || !deferredPrompt) return null;
+  const needsNotification = 'Notification' in window && Notification.permission === 'default';
+
+  if (!showPrompt || (!deferredPrompt && !needsNotification)) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:w-96 md:bottom-8 md:right-8 bg-[#0D1117] border border-[var(--border)] rounded-xl p-5 shadow-2xl z-50 animate-fade-in flex flex-col gap-4">
       <div className="flex items-center gap-4">
         <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain flex-shrink-0" />
         <p className="text-[var(--text-main)] font-medium text-sm leading-snug">
-          Instale o Homework Organizer na sua tela inicial!
+          Instale o app e ative as notificações para não esquecer nenhum dever!
         </p>
       </div>
       <div className="flex gap-2 w-full mt-1">
@@ -74,7 +84,7 @@ export function InstallPWA() {
           onClick={handleInstall}
           className="flex-1 px-4 py-2 rounded bg-primary text-white text-xs font-medium hover:opacity-90 transition-opacity shadow-glow-subtle"
         >
-          Instalar
+          {deferredPrompt ? 'Instalar App' : 'Ativar Alertas'}
         </button>
       </div>
     </div>

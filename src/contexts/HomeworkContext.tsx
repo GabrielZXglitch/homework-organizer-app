@@ -24,6 +24,28 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Local Notification Logic
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const isToday = (date: Date) => {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear();
+      };
+      const hasPendingToday = homeworks.some(hw => hw.status === 'pendente' && isToday(hw.prazo instanceof Timestamp ? hw.prazo.toDate() : new Date(hw.prazo)));
+      const alreadyNotified = localStorage.getItem('notified_today') === new Date().toDateString();
+
+      if (hasPendingToday && !alreadyNotified) {
+        new Notification('Lembrete de Dever', {
+          body: 'Você tem tarefas pendentes para entregar hoje! Não deixe para a última hora.',
+          icon: '/logo.png'
+        });
+        localStorage.setItem('notified_today', new Date().toDateString());
+      }
+    }
+  }, [homeworks]);
+
   useEffect(() => {
     if (!currentUser) {
       setHomeworks([]);

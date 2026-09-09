@@ -17,8 +17,11 @@ export function Perfil() {
   const xp = userProfile?.xpTotal || 0;
   const streak = userProfile?.streakDias || 0;
   
+  const isPwaInstalled = window.matchMedia('(display-mode: standalone)').matches;
+  const isNotificationsEnabled = 'Notification' in window && Notification.permission === 'granted';
+
   const { level, currentXP, nextLevelXP, progress } = calculateLevel(xp);
-  const achievements = getAchievements(xp, streak, completedCount);
+  const achievements = getAchievements(xp, streak, completedCount, isPwaInstalled, isNotificationsEnabled);
 
   const handleLogout = async () => {
     await logout();
