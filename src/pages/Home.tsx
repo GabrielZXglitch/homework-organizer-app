@@ -250,10 +250,10 @@ export function Home() {
 
       {/* Action Bar / FAB */}
       {isSelectionMode ? (
-        <aside className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] p-4 flex items-center justify-between z-50 animate-slide-up shadow-glow-subtle md:max-w-2xl md:mx-auto md:rounded-t-2xl md:bottom-0">
+        <aside className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 bg-[#1a1f2e] p-4 flex items-center justify-between z-40 animate-slide-up shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:max-w-2xl md:mx-auto md:rounded-t-xl">
           <button 
             onClick={cancelSelection}
-            className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors px-4 py-2"
+            className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-4 py-2"
           >
             Cancelar
           </button>
@@ -262,7 +262,7 @@ export function Home() {
             {selectedIds.size === 1 && (
               <button 
                 onClick={() => navigate(`/app/editar/${Array.from(selectedIds)[0]}`)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--surface-hover)] text-[var(--text-main)] font-medium text-sm hover:bg-[var(--border)] transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm hover:bg-indigo-500 transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px]">edit</span>
                 Editar
@@ -270,7 +270,7 @@ export function Home() {
             )}
             <button 
               onClick={handleDeleteSelected}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-500 font-medium text-sm hover:bg-red-500/20 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-500 transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">delete</span>
               {selectedIds.size === 1 ? 'Deletar' : `Deletar (${selectedIds.size})`}
@@ -278,7 +278,7 @@ export function Home() {
           </div>
         </aside>
       ) : (
-        <aside className="fixed bottom-6 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40 animate-fade-in">
+        <aside className="fixed bottom-24 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40 animate-fade-in">
           <button 
             onClick={() => navigate('/app/novo')}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
