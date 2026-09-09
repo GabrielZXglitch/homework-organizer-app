@@ -50,7 +50,7 @@ export function Home() {
       {/* Header & Stats - Sleek / Linear Vibe */}
       <header className="pt-10 pb-6 flex items-end justify-between border-b border-[var(--border)]">
         <div className="flex gap-3 items-center">
-          <div className="w-10 h-10 rounded-full border border-[var(--border)] overflow-hidden bg-[var(--surface)] flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/perfil')}>
+          <div className="w-10 h-10 rounded-full border border-[var(--border)] overflow-hidden bg-[var(--surface)] flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/app/perfil')}>
             {userProfile?.avatar || currentUser?.photoURL ? (
               <img src={userProfile?.avatar || currentUser?.photoURL || ''} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
@@ -105,7 +105,7 @@ export function Home() {
           ))}
         </div>
         <button 
-          onClick={() => navigate('/novo')}
+          onClick={() => navigate('/app/novo')}
           className="flex-shrink-0 bg-[var(--text-main)] text-[var(--background)] h-8 px-3 rounded-md font-medium text-xs flex items-center gap-1 hover:opacity-90 transition-opacity ml-4"
         >
           <span className="material-symbols-outlined text-[16px]">add</span>
