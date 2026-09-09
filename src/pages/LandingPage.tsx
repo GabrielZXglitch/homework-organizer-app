@@ -51,9 +51,10 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3 font-semibold tracking-tight text-lg">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-            Homework Organizer
+          <div className="flex items-center gap-3 font-semibold tracking-tight text-lg whitespace-nowrap">
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
+            <span className="md:hidden">HW Organizer</span>
+            <span className="hidden md:inline">Homework Organizer</span>
           </div>
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/login')} className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
