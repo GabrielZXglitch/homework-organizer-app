@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti';
 export function ConcluirDever() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { homeworks, completeHomework, deleteHomework } = useHomeworks();
+  const { homeworks, completeHomework } = useHomeworks();
   
   const hw = homeworks.find(h => h.id === id);
   const [photoData, setPhotoData] = useState<string | null>(null);
@@ -18,13 +18,6 @@ export function ConcluirDever() {
   }, [hw, navigate]);
 
   if (!hw) return null;
-
-  const handleDelete = async () => {
-    if (window.confirm("Tem certeza que quer deletar este dever?")) {
-      await deleteHomework(hw.id);
-      navigate('/app');
-    }
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -100,24 +93,6 @@ export function ConcluirDever() {
             Voltar
           </button>
           <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] absolute left-1/2 -translate-x-1/2">Resolver Tarefa</span>
-          <div className="flex items-center gap-3">
-            {hw.status === 'pendente' && (
-              <button 
-                onClick={() => navigate(`/app/editar/${hw.id}`)}
-                className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-                title="Editar"
-              >
-                <span className="material-symbols-outlined text-[18px]">edit</span>
-              </button>
-            )}
-            <button 
-              onClick={handleDelete}
-              className="text-[var(--text-muted)] hover:text-red-500 transition-colors"
-              title="Deletar"
-            >
-              <span className="material-symbols-outlined text-[18px]">delete</span>
-            </button>
-          </div>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import { calculateLevel } from '../utils/gamification';
@@ -31,7 +31,7 @@ import { Onboarding } from '../components/Onboarding';
 
 export function Home() {
   const { userProfile, currentUser } = useAuth();
-  const { homeworks, loading } = useHomeworks();
+  const { homeworks, loading, deleteHomework } = useHomeworks();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'hoje' | 'semana' | 'todos'>('semana');
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('has_seen_onboarding'));
@@ -44,11 +44,59 @@ export function Home() {
   const pendingHomeworks = homeworks.filter(hw => hw.status === 'pendente');
   const displayedHomeworks = filterHomeworksByPeriod(pendingHomeworks, filter);
 
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const formatPrazo = (dateValue: Timestamp | Date) => {
     const d = dateValue instanceof Timestamp ? dateValue.toDate() : dateValue;
     if (isToday(d)) return `Hoje, ${format(d, 'HH:mm')}`;
     if (isTomorrow(d)) return `Amanhã, ${format(d, 'HH:mm')}`;
     return format(d, "dd MMM, HH:mm", { locale: ptBR });
+  };
+
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = (id: string) => {
+    if (isSelectionMode) return;
+    longPressTimer.current = setTimeout(() => {
+      setIsSelectionMode(true);
+      setSelectedIds(new Set([id]));
+      if (window.navigator.vibrate) window.navigator.vibrate(50);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const handleTouchMove = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const handleCardClick = (id: string) => {
+    if (isSelectionMode) {
+      const next = new Set(selectedIds);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      setSelectedIds(next);
+      if (next.size === 0) setIsSelectionMode(false);
+    } else {
+      navigate(`/app/concluir/${id}`);
+    }
+  };
+
+  const cancelSelection = () => {
+    setIsSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const handleDeleteSelected = async () => {
+    if (window.confirm(`Deletar ${selectedIds.size} dever(es) selecionado(s)?`)) {
+      for (const id of selectedIds) {
+        await deleteHomework(id);
+      }
+      cancelSelection();
+    }
   };
 
   const getSubjectInitials = (subject: string) => subject.substring(0, 2).toUpperCase();
@@ -142,12 +190,28 @@ export function Home() {
           displayedHomeworks.map(hw => (
             <article 
               key={hw.id} 
-              onClick={() => navigate(`/app/concluir/${hw.id}`)}
-              className="bg-[var(--surface)] hover:bg-[var(--surface-hover)] p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer transition-colors group"
+              onClick={() => handleCardClick(hw.id)}
+              onMouseDown={() => handleTouchStart(hw.id)}
+              onMouseUp={handleTouchEnd}
+              onMouseLeave={handleTouchMove}
+              onTouchStart={() => handleTouchStart(hw.id)}
+              onTouchEnd={handleTouchEnd}
+              onTouchMove={handleTouchMove}
+              className={`bg-[var(--surface)] hover:bg-[var(--surface-hover)] p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer transition-colors group ${
+                isSelectionMode && selectedIds.has(hw.id) ? 'bg-indigo-500/10 border-l-2 border-indigo-500' : ''
+              }`}
             >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {/* Checkbox Placeholder */}
-                <div className="flex-shrink-0 w-4 h-4 rounded-sm border border-[var(--text-muted)] group-hover:border-primary transition-colors flex items-center justify-center"></div>
+              <div className="flex items-center gap-3 flex-1 min-w-0 pointer-events-none">
+                {/* Checkbox Placeholder / Actual Checkbox */}
+                {isSelectionMode ? (
+                  <div className={`flex-shrink-0 w-5 h-5 rounded-sm border flex items-center justify-center transition-colors ${
+                    selectedIds.has(hw.id) ? 'bg-indigo-500 border-indigo-500' : 'border-[var(--text-muted)] group-hover:border-indigo-500'
+                  }`}>
+                    {selectedIds.has(hw.id) && <span className="material-symbols-outlined text-[14px] text-white">check</span>}
+                  </div>
+                ) : (
+                  <div className="flex-shrink-0 w-4 h-4 rounded-sm border border-[var(--text-muted)] group-hover:border-primary transition-colors flex items-center justify-center"></div>
+                )}
                 
                 {/* ID & Title */}
                 <div className="flex-1 min-w-0 flex items-baseline gap-2">
@@ -177,16 +241,46 @@ export function Home() {
         )}
       </section>
 
-      {/* FAB - Re-styled as a primary action button, more Vercel-like */}
-      <aside className="fixed bottom-6 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40">
-        <button 
-          onClick={() => navigate('/app/novo')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
-        >
-          <span className="material-symbols-outlined text-[18px]">add</span>
-          Nova Tarefa
-        </button>
-      </aside>
+      {/* Action Bar / FAB */}
+      {isSelectionMode ? (
+        <aside className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] p-4 flex items-center justify-between z-50 animate-slide-up shadow-glow-subtle md:max-w-2xl md:mx-auto md:rounded-t-2xl md:bottom-0">
+          <button 
+            onClick={cancelSelection}
+            className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors px-4 py-2"
+          >
+            Cancelar
+          </button>
+          
+          <div className="flex gap-2">
+            {selectedIds.size === 1 && (
+              <button 
+                onClick={() => navigate(`/app/editar/${Array.from(selectedIds)[0]}`)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--surface-hover)] text-[var(--text-main)] font-medium text-sm hover:bg-[var(--border)] transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">edit</span>
+                Editar
+              </button>
+            )}
+            <button 
+              onClick={handleDeleteSelected}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-500 font-medium text-sm hover:bg-red-500/20 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">delete</span>
+              {selectedIds.size === 1 ? 'Deletar' : `Deletar (${selectedIds.size})`}
+            </button>
+          </div>
+        </aside>
+      ) : (
+        <aside className="fixed bottom-6 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40 animate-fade-in">
+          <button 
+            onClick={() => navigate('/app/novo')}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Nova Tarefa
+          </button>
+        </aside>
+      )}
     </main>
   );
 }
