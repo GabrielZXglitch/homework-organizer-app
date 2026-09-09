@@ -220,19 +220,7 @@ export function NovoDever() {
               </div>
             </div>
 
-            {/* Foto Checkbox */}
-            <div className="flex flex-col justify-center">
-              <label className="flex items-center gap-3 cursor-pointer group mt-4 sm:mt-0 p-3 rounded border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--text-muted)] transition-colors">
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-[var(--text-main)] block">Prova Visual</span>
-                  <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] block mt-0.5">Exigir foto</span>
-                </div>
-                <div className="relative">
-                  <input checked={exigeFoto} onChange={(e) => setExigeFoto(e.target.checked)} className="sr-only peer" type="checkbox"/>
-                  <div className="w-9 h-5 bg-[var(--border)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--text-main)] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                </div>
-              </label>
-            </div>
+
 
           </div>
         </form>
