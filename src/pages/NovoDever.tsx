@@ -9,7 +9,7 @@ export function NovoDever() {
   const { addHomework } = useHomeworks();
   
   const [titulo, setTitulo] = useState('');
-  const [materia, setMateria] = useState('Matemática');
+  const [materia, setMateria] = useState('Português');
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState<HomeworkPriority>('tranquilo');
   const [dueDate, setDueDate] = useState(() => format(startOfTomorrow(), 'yyyy-MM-dd'));
@@ -22,11 +22,16 @@ export function NovoDever() {
   const [customSubjects, setCustomSubjects] = useState<string[]>([]);
 
   const defaultSubjects = [
-    { id: 'Matemática', label: 'Matemática' },
-    { id: 'História', label: 'História' },
-    { id: 'Ciências', label: 'Ciências' },
     { id: 'Português', label: 'Português' },
-    { id: 'Inglês', label: 'Inglês' }
+    { id: 'Redação', label: 'Redação' },
+    { id: 'Geografia', label: 'Geografia' },
+    { id: 'Ciências', label: 'Ciências' },
+    { id: 'Inglês', label: 'Inglês' },
+    { id: 'Matemática', label: 'Matemática' },
+    { id: 'Educação Física', label: 'Educação Física' },
+    { id: 'História', label: 'História' },
+    { id: 'Artes', label: 'Artes' },
+    { id: 'Filosofia', label: 'Filosofia' }
   ];
 
   const allSubjects = [
