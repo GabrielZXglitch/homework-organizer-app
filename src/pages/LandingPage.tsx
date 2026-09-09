@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,6 +31,13 @@ const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode, de
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const { currentUser, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && currentUser) {
+      navigate('/app', { replace: true });
+    }
+  }, [currentUser, loading, navigate]);
 
   const faqs = [
     { q: "O app é gratuito?", a: "Sim, 100% gratuito." },
