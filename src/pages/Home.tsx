@@ -58,8 +58,8 @@ export function Home() {
             )}
           </div>
           <div>
-            <h2 className="text-[var(--text-muted)] text-[11px] font-mono tracking-wider uppercase mb-0.5">
-              Olá, {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'}
+            <h2 className="text-[var(--text-muted)] text-sm mb-0.5">
+              Olá, <span className="font-semibold text-[var(--text-main)]">{userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'}</span>
             </h2>
             <h1 className="text-[var(--text-main)] text-xl md:text-2xl font-bold tracking-tight leading-none">
               Tarefas Ativas
