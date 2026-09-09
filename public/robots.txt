@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://homework-organizer.vercel.app/sitemap.xml
+Sitemap: https://homework-organizer-app.vercel.app/sitemap.xml
