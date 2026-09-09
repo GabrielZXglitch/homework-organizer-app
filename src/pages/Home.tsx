@@ -27,11 +27,19 @@ const filterHomeworksByPeriod = (hws: Homework[], filter: string) => {
   return hws;
 };
 
+import { Onboarding } from '../components/Onboarding';
+
 export function Home() {
   const { userProfile, currentUser } = useAuth();
   const { homeworks, loading } = useHomeworks();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'hoje' | 'semana' | 'todos'>('semana');
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('has_seen_onboarding'));
+
+  const handleFinishOnboarding = () => {
+    localStorage.setItem('has_seen_onboarding', 'true');
+    setShowOnboarding(false);
+  };
 
   const pendingHomeworks = homeworks.filter(hw => hw.status === 'pendente');
   const displayedHomeworks = filterHomeworksByPeriod(pendingHomeworks, filter);
@@ -44,6 +52,10 @@ export function Home() {
   };
 
   const getSubjectInitials = (subject: string) => subject.substring(0, 2).toUpperCase();
+
+  if (showOnboarding) {
+    return <Onboarding onFinish={handleFinishOnboarding} />;
+  }
 
   return (
     <main className="flex-1 flex flex-col relative w-full px-5 md:max-w-2xl md:mx-auto pb-24 min-h-screen bg-[var(--background)] animate-fade-in">

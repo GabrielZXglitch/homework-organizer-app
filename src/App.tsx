@@ -38,6 +38,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/app" element={<ProtectedRoute><Home /></ProtectedRoute>} />
       <Route path="/app/novo" element={<ProtectedRoute hideNav><NovoDever /></ProtectedRoute>} />
+      <Route path="/app/editar/:id" element={<ProtectedRoute hideNav><NovoDever /></ProtectedRoute>} />
       <Route path="/app/concluir/:id" element={<ProtectedRoute hideNav><ConcluirDever /></ProtectedRoute>} />
       <Route path="/app/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
       <Route path="/app/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />

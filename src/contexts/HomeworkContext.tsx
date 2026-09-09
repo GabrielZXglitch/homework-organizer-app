@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, where, onSnapshot, doc, setDoc, writeBatch, Timestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, writeBatch, Timestamp, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { calculateXP, calculateStreak } from '../utils/gamification';
 import type { Homework, HomeworkStatus } from '../types';
@@ -10,6 +10,8 @@ interface HomeworkContextType {
   loading: boolean;
   addHomework: (hw: Omit<Homework, 'id' | 'userId' | 'status' | 'dataConclusao' | 'xpGanho' | 'createdAt'>) => Promise<void>;
   completeHomework: (homeworkId: string, withPhoto: boolean) => Promise<void>;
+  updateHomework: (id: string, data: Partial<Homework>) => Promise<void>;
+  deleteHomework: (id: string) => Promise<void>;
 }
 
 const HomeworkContext = createContext<HomeworkContextType>({} as HomeworkContextType);
@@ -122,8 +124,20 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
     await batch.commit();
   }
 
+  async function updateHomework(id: string, data: Partial<Homework>) {
+    if (!currentUser) return;
+    const hwRef = doc(db, 'homeworks', id);
+    await updateDoc(hwRef, data);
+  }
+
+  async function deleteHomework(id: string) {
+    if (!currentUser) return;
+    const hwRef = doc(db, 'homeworks', id);
+    await deleteDoc(hwRef);
+  }
+
   return (
-    <HomeworkContext.Provider value={{ homeworks, loading, addHomework, completeHomework }}>
+    <HomeworkContext.Provider value={{ homeworks, loading, addHomework, completeHomework, updateHomework, deleteHomework }}>
       {children}
     </HomeworkContext.Provider>
   );

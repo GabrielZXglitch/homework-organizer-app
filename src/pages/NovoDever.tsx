@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { HomeworkPriority } from '../types';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import { format, startOfTomorrow } from 'date-fns';
+import { Timestamp } from 'firebase/firestore';
 
 export function NovoDever() {
   const navigate = useNavigate();
-  const { addHomework } = useHomeworks();
+  const { id } = useParams();
+  const { addHomework, updateHomework, homeworks } = useHomeworks();
   
   const [titulo, setTitulo] = useState('');
   const [materia, setMateria] = useState('Português');
@@ -20,6 +22,24 @@ export function NovoDever() {
   const [isAddingSubject, setIsAddingSubject] = useState(false);
   const [newSubject, setNewSubject] = useState('');
   const [customSubjects, setCustomSubjects] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (id) {
+      const hwToEdit = homeworks.find(h => h.id === id);
+      if (hwToEdit) {
+        setTitulo(hwToEdit.titulo);
+        setMateria(hwToEdit.materia);
+        setDescricao(hwToEdit.descricao || '');
+        setPrioridade(hwToEdit.prioridade);
+        const d = hwToEdit.prazo instanceof Timestamp ? hwToEdit.prazo.toDate() : hwToEdit.prazo as Date;
+        setDueDate(format(d, 'yyyy-MM-dd'));
+        setDueTime(format(d, 'HH:mm'));
+        if (!['Português', 'Redação', 'Geografia', 'Ciências', 'Inglês', 'Matemática'].includes(hwToEdit.materia)) {
+            setCustomSubjects(prev => prev.includes(hwToEdit.materia) ? prev : [...prev, hwToEdit.materia]);
+        }
+      }
+    }
+  }, [id, homeworks]);
 
   const defaultSubjects = [
     { id: 'Português', label: 'Português' },
@@ -58,16 +78,26 @@ export function NovoDever() {
       const [hour, minute] = dueTime.split(':').map(Number);
       const prazo = new Date(year, month - 1, day, hour, minute);
 
-      await addHomework({
-        titulo: titulo.trim(),
-        materia,
-        descricao: descricao.trim(),
-        prazo,
-        prioridade,
-        exigeFoto,
-      });
+      if (id) {
+        await updateHomework(id, {
+          titulo: titulo.trim(),
+          materia,
+          descricao: descricao.trim(),
+          prazo,
+          prioridade,
+        });
+      } else {
+        await addHomework({
+          titulo: titulo.trim(),
+          materia,
+          descricao: descricao.trim(),
+          prazo,
+          prioridade,
+          exigeFoto,
+        });
+      }
 
-      navigate('/app');
+      navigate(-1);
     } catch (error) {
       console.error(error);
       alert('Erro ao salvar. Tente novamente.');
@@ -82,12 +112,12 @@ export function NovoDever() {
         <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
           <button 
             type="button" 
-            onClick={() => navigate('/app')}
+            onClick={() => navigate(-1)}
             className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
             Cancelar
           </button>
-          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">Nova Tarefa</span>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)]">{id ? 'Editar Tarefa' : 'Nova Tarefa'}</span>
           <button 
             onClick={handleSubmit}
             disabled={saving || !titulo.trim()}
