@@ -113,7 +113,7 @@ export function LandingPage() {
           <img 
             src="/mockup.png" 
             alt="App Mockup" 
-            className="block w-full h-auto object-contain md:max-w-[800px]"
+            style={{ width: '100%', maxWidth: '700px', height: 'auto', display: 'block', margin: '0 auto' }}
           />
         </RevealOnScroll>
       </section>
