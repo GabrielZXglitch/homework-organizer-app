@@ -8,6 +8,7 @@ export interface User {
   streakDias: number;
   ultimoConcluido: Timestamp | Date | null;
   createdAt: Timestamp | Date;
+  avatar?: string;
 }
 
 export type HomeworkPriority = 'tranquilo' | 'importante' | 'urgente';

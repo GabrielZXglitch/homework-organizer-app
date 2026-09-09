@@ -49,13 +49,22 @@ export function Home() {
       
       {/* Header & Stats - Sleek / Linear Vibe */}
       <header className="pt-10 pb-6 flex items-end justify-between border-b border-[var(--border)]">
-        <div>
-          <h2 className="text-[var(--text-muted)] text-xs font-mono tracking-wider uppercase mb-1">
-            {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'}
-          </h2>
-          <h1 className="text-[var(--text-main)] text-2xl font-bold tracking-tight">
-            Tarefas Ativas
-          </h1>
+        <div className="flex gap-3 items-center">
+          <div className="w-10 h-10 rounded-full border border-[var(--border)] overflow-hidden bg-[var(--surface)] flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/perfil')}>
+            {userProfile?.avatar || currentUser?.photoURL ? (
+              <img src={userProfile?.avatar || currentUser?.photoURL || ''} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-[20px] text-[var(--text-muted)]">person</span>
+            )}
+          </div>
+          <div>
+            <h2 className="text-[var(--text-muted)] text-[11px] font-mono tracking-wider uppercase mb-0.5">
+              Olá, {userProfile?.nome?.split(' ')[0] || currentUser?.displayName?.split(' ')[0] || 'Aluno'}
+            </h2>
+            <h1 className="text-[var(--text-main)] text-xl md:text-2xl font-bold tracking-tight leading-none">
+              Tarefas Ativas
+            </h1>
+          </div>
         </div>
         <div className="flex gap-4">
           <div className="flex flex-col items-end">
@@ -74,25 +83,34 @@ export function Home() {
         </div>
       </header>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-4 mt-6 mb-8 overflow-x-auto no-scrollbar">
-        {[
-          { id: 'hoje', label: 'Hoje' },
-          { id: 'semana', label: 'Esta Semana' },
-          { id: 'todos', label: 'Todas' }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setFilter(tab.id as 'hoje' | 'semana' | 'todos')}
-            className={`flex-shrink-0 text-sm font-medium transition-colors pb-1 border-b-2 ${
-              filter === tab.id 
-                ? 'text-[var(--text-main)] border-[var(--text-main)]'
-                : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-main)]'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Filter Tabs & Add Button */}
+      <div className="flex items-center justify-between mt-6 mb-8">
+        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'hoje', label: 'Hoje' },
+            { id: 'semana', label: 'Esta Semana' },
+            { id: 'todos', label: 'Todas' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setFilter(tab.id as 'hoje' | 'semana' | 'todos')}
+              className={`flex-shrink-0 text-sm font-medium transition-colors pb-1 border-b-2 ${
+                filter === tab.id 
+                  ? 'text-[var(--text-main)] border-[var(--text-main)]'
+                  : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-main)]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <button 
+          onClick={() => navigate('/novo')}
+          className="flex-shrink-0 bg-[var(--text-main)] text-[var(--background)] h-8 px-3 rounded-md font-medium text-xs flex items-center gap-1 hover:opacity-90 transition-opacity ml-4"
+        >
+          <span className="material-symbols-outlined text-[16px]">add</span>
+          Novo
+        </button>
       </div>
 
       {/* Task List */}
