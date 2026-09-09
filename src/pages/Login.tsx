@@ -24,8 +24,12 @@ export function Login() {
         await registerWithEmail(nome, email, senha);
         navigate('/app');
       }
-    } catch (err: any) {
-      setError(err.message || 'Ocorreu um erro');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Ocorreu um erro');
+      }
     }
   };
 
@@ -34,8 +38,12 @@ export function Login() {
     try {
       await loginWithGoogle();
       navigate('/app');
-    } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login com Google');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Erro ao fazer login com Google');
+      }
     }
   };
 

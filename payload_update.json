@@ -1,0 +1,78 @@
+{
+  "title": "Escolha a identidade visual (Re-roll 1)",
+  "question": "Novas opções geradas. Mantenha a original com seus novos atributos, escolha uma nova direção ou jogue os dados novamente.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Arcade High Score",
+      "kicker": "THE ROLL",
+      "lineage": "Fliperamas clássicos dos anos 80 e 90",
+      "thesis": "A lição de casa como uma missão de fliperama: alta energia, recompensa imediata.",
+      "palette": ["#111111", "#ff003c", "#00e5ff", "#fcfcfc"],
+      "materials": ["telas CRT", "fichas metálicas"],
+      "viewport": "O estudante insere uma foto como 'ficha', com placares das missões já concluídas piscando como high-scores.",
+      "risk": "Pode parecer muito retrô ou poluído se a grade não for rigorosa.",
+      "raised": [
+        {
+          "from": "Oscilloscope",
+          "raise": "Adiciona gráficos de varredura precisos: a validação da foto parece um escaneamento de sinal."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.png",
+      "board": "https://impeccable.style/worlds/cards/games-arcade-high-score-table.webp"
+    },
+    {
+      "id": "challenger-racing",
+      "label": "Racing League (Anti-aliased)",
+      "verdict": "wins",
+      "lineage": "Estética de games de corrida futurista (Wipeout)",
+      "thesis": "Tarefas como circuitos de corrida de alta velocidade com leitura instantânea.",
+      "palette": ["#ff4500", "#c0ff00", "#2c2f33", "#ffffff"],
+      "materials": ["tipografia blocky", "motion blur"],
+      "viewport": "Interface em ângulo, tarefas lidas como tempos de volta de corrida, energia máxima e layouts horizontais.",
+      "case": "Supera o arcade original pois é mais dinâmico, moderno e tem forte apelo visual esportivo para jovens.",
+      "comp": ".impeccable/mocks/decision/challenger-racing.png",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-antialiased-racing-league-hero.webp"
+    },
+    {
+      "id": "challenger-streaming",
+      "label": "Streaming Catalog Wall",
+      "verdict": "competitive",
+      "lineage": "Apps modernos de streaming (Netflix/Disney+)",
+      "thesis": "As lições de casa expostas como grandes pôsteres interativos em uma estante.",
+      "palette": ["#0b0b0e", "#ffffff", "#e50914"],
+      "materials": ["pôsteres full-bleed", "dark mode profundo"],
+      "viewport": "Paredes horizontais de tarefas que se expandem em foco com transições suaves.",
+      "case": "Excelente clareza (fácil de usar) mas ligeiramente menos 'gamificado' que a corrida ou arcade.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-streaming-title-card-wall-hero.webp"
+    },
+    {
+      "id": "challenger-oscilloscope",
+      "label": "Oscilloscope Bench",
+      "verdict": "declined",
+      "lineage": "Bancada de instrumentos científicos",
+      "palette": ["#00ff00", "#111111"],
+      "materials": ["fósforo verde", "vidro"],
+      "case": "Técnico e obscuro demais para estudantes.",
+      "kept": "A varredura visual precisa da validação."
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "A to-do list padrão escolar",
+    "thesis": "O que todo app de educação faz: seguro, limpo e esquecível.",
+    "palette": ["#ffffff", "#f3f4f6", "#3b82f6"],
+    "materials": ["cards brancos arredondados", "sombras suaves"],
+    "viewport": "Lista de tarefas tradicional com caixas de seleção e interface neutra.",
+    "risk": "Garante que o app pareça com mil outras to-do lists, perdendo o estímulo gamificado.",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  },
+  "steer": true
+}

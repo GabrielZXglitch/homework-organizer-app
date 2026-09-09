@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { Timestamp } from 'firebase/firestore';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import type { Homework } from '../types';
 
-const filterHomeworksByPeriod = (hws: any[], filter: string) => {
+const filterHomeworksByPeriod = (hws: Homework[], filter: string) => {
   const now = new Date();
   if (filter === 'hoje') {
     return hws.filter(hw => {
@@ -82,7 +83,7 @@ export function Home() {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setFilter(tab.id as any)}
+            onClick={() => setFilter(tab.id as 'hoje' | 'semana' | 'todos')}
             className={`flex-shrink-0 text-sm font-medium transition-colors pb-1 border-b-2 ${
               filter === tab.id 
                 ? 'text-[var(--text-main)] border-[var(--text-main)]'

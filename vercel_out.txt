@@ -1,0 +1,15 @@
+Vercel CLI 59.11.7 (Node.js 22.22.1)
+
+  Directory       ~/project
+
+Loading teams…
+  Team            gabriel-venturas-projects-bc01d226
+Searching for existing projects…
+Searching for existing projects…
+
+  Detected Vite (Build Command: vite build, Output Directory: dist)
+
+✓ Created         gabriel-venturas-projects-bc01d226/project
+> Connecting GitHub repository: https://github.com/GabrielZXglitch/homework-organizer-app
+> Connected
+Deploying gabriel-venturas-projects-bc01d226/project

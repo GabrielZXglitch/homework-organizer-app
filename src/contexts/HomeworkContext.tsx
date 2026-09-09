@@ -14,6 +14,7 @@ interface HomeworkContextType {
 
 const HomeworkContext = createContext<HomeworkContextType>({} as HomeworkContextType);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useHomeworks() {
   return useContext(HomeworkContext);
 }

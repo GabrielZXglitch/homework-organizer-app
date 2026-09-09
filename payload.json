@@ -1,0 +1,67 @@
+{
+  "title": "Escolha a identidade visual do Redesign",
+  "question": "A rolagem atribuiu Arcade High Score. Mantenha-a, escolha uma alternativa ou jogue os dados novamente.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Arcade High Score",
+      "kicker": "THE ROLL",
+      "lineage": "Fliperamas clássicos dos anos 80 e 90",
+      "thesis": "A lição de casa como uma missão de fliperama: alta energia, recompensa imediata.",
+      "palette": ["#111111", "#ff003c", "#00e5ff", "#fcfcfc"],
+      "materials": ["telas CRT", "fichas metálicas"],
+      "viewport": "O estudante insere uma foto como 'ficha', com placares das missões já concluídas piscando como high-scores.",
+      "risk": "Pode parecer muito retrô ou poluído se a grade não for rigorosa.",
+      "raised": [
+        {
+          "from": "Ikeda Datamatics",
+          "raise": "Rigor absoluto em grade: listas e nomes devem alinhar perfeitamente como tabelas de dados."
+        },
+        {
+          "from": "Gravity Rain Garden",
+          "raise": "Física ao concluir: a tarefa finalizada 'cai' fisicamente em uma caixa de recompensas."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.png",
+      "board": "https://impeccable.style/worlds/cards/games-arcade-high-score-table.webp"
+    },
+    {
+      "id": "challenger-ikeda",
+      "label": "Data-Sublime Field",
+      "verdict": "declined",
+      "lineage": "Ikeda Datamatics",
+      "palette": ["#000000", "#ffffff"],
+      "materials": ["pixels puros", "barcodes"],
+      "case": "Demasiado abstrato para estudantes, falhando em identificação, mas cede seu rigor ao vencedor.",
+      "kept": "Rigor na estruturação dos dados."
+    },
+    {
+      "id": "challenger-gravity",
+      "label": "Gravity Rain Garden",
+      "verdict": "declined",
+      "lineage": "Mundos impossíveis e surreais",
+      "palette": ["#2e3d36", "#8ab4f8", "#f28b82"],
+      "materials": ["jardim ilustrado", "física simulada"],
+      "case": "Não ajuda a clareza da tarefa, mas cede seu engajamento físico (queda de itens) ao vencedor.",
+      "kept": "Queda física dos itens e recompensa visual iterativa."
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "A to-do list padrão escolar",
+    "thesis": "O que todo app de educação faz: seguro, limpo e esquecível.",
+    "palette": ["#ffffff", "#f3f4f6", "#3b82f6"],
+    "materials": ["cards brancos arredondados", "sombras suaves"],
+    "viewport": "Lista de tarefas tradicional com caixas de seleção e interface neutra.",
+    "risk": "Garante que o app pareça com mil outras to-do lists, perdendo o estímulo gamificado.",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  },
+  "steer": true
+}
