@@ -149,6 +149,56 @@ export function Perfil() {
           </div>
         </div>
 
+        {(!isPwaInstalled || !isNotificationsEnabled) && (
+          <>
+            <h2 className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] mb-4">Configurações</h2>
+            <div className="grid grid-cols-1 gap-3 mb-8">
+              {!isPwaInstalled && (
+                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[var(--text-muted)]">install_mobile</span>
+                    <div>
+                      <h3 className="text-sm font-bold text-[var(--text-main)]">Instalar Aplicativo</h3>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Adicione à tela inicial</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      localStorage.removeItem('pwa-prompt-dismissed');
+                      window.location.reload();
+                    }} 
+                    className="px-4 py-2 bg-primary/10 text-primary text-xs font-medium rounded hover:bg-primary/20 transition-colors"
+                  >
+                    Instalar
+                  </button>
+                </div>
+              )}
+
+              {!isNotificationsEnabled && (
+                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[var(--text-muted)]">notifications</span>
+                    <div>
+                      <h3 className="text-sm font-bold text-[var(--text-main)]">Ativar Notificações</h3>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">Receba lembretes de deveres</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      if ('Notification' in window) {
+                        Notification.requestPermission().then(() => window.location.reload());
+                      }
+                    }} 
+                    className="px-4 py-2 bg-primary/10 text-primary text-xs font-medium rounded hover:bg-primary/20 transition-colors"
+                  >
+                    Ativar
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         <h2 className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] mb-4">Conquistas</h2>
         <div className="grid grid-cols-1 gap-3">
           {achievements.map((ach) => (
