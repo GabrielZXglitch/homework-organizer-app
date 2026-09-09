@@ -14,7 +14,7 @@ export function NovoDever() {
   const [prioridade, setPrioridade] = useState<HomeworkPriority>('tranquilo');
   const [dueDate, setDueDate] = useState(() => format(startOfTomorrow(), 'yyyy-MM-dd'));
   const [dueTime, setDueTime] = useState('23:59');
-  const [exigeFoto, setExigeFoto] = useState(true);
+  const exigeFoto = true;
   const [saving, setSaving] = useState(false);
 
   const [isAddingSubject, setIsAddingSubject] = useState(false);

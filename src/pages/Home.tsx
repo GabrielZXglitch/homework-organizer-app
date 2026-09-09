@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHomeworks } from '../contexts/HomeworkContext';
+import { calculateLevel } from '../utils/gamification';
 import { useNavigate } from 'react-router-dom';
 import { Timestamp } from 'firebase/firestore';
 import { format, isToday, isTomorrow } from 'date-fns';
@@ -75,7 +76,7 @@ export function Home() {
             </span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Experiência</span>
+            <span className="text-[var(--text-muted)] text-[10px] font-mono tracking-wider uppercase">Nível {calculateLevel(userProfile?.xpTotal || 0).level}</span>
             <span className="text-primary text-sm font-semibold flex items-center gap-1">
               {userProfile?.xpTotal || 0} XP
             </span>

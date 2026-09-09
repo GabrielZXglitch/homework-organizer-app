@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useHomeworks } from '../contexts/HomeworkContext';
+import { calculateLevel, getAchievements } from '../utils/gamification';
 
 import { useState, useRef } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -13,6 +14,11 @@ export function Perfil() {
   const [loadingAvatar, setLoadingAvatar] = useState(false);
   
   const completedCount = homeworks.filter(h => h.status === 'concluido').length;
+  const xp = userProfile?.xpTotal || 0;
+  const streak = userProfile?.streakDias || 0;
+  
+  const { level, currentXP, nextLevelXP, progress } = calculateLevel(xp);
+  const achievements = getAchievements(xp, streak, completedCount);
 
   const handleLogout = async () => {
     await logout();
@@ -104,16 +110,33 @@ export function Perfil() {
           <p className="text-[var(--text-muted)] text-sm">{currentUser?.email}</p>
         </div>
 
+        <h2 className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] mb-4 mt-2">Seu Nível</h2>
+        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5 mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[24px]">shield</span>
+              <span className="text-xl font-bold text-[var(--text-main)]">Nível {level}</span>
+            </div>
+            <span className="text-xs text-[var(--text-muted)] font-medium">{currentXP} / {nextLevelXP} XP</span>
+          </div>
+          <div className="w-full h-2.5 bg-[var(--background)] rounded-full overflow-hidden border border-[var(--border)]">
+            <div className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" style={{ width: `${progress}%` }}></div>
+          </div>
+          <p className="text-[10px] text-[var(--text-muted)] text-center mt-3 uppercase tracking-wider font-mono">
+            {nextLevelXP - currentXP} XP para o próximo nível
+          </p>
+        </div>
+
         <h2 className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] mb-4">Estatísticas</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5 flex flex-col items-center justify-center gap-2">
             <span className="material-symbols-outlined text-secondary text-[24px]">local_fire_department</span>
-            <span className="text-2xl font-bold text-[var(--text-main)]">{userProfile?.streakDias || 0}</span>
+            <span className="text-2xl font-bold text-[var(--text-main)]">{streak}</span>
             <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] text-center">Dias de Ofensiva</span>
           </div>
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5 flex flex-col items-center justify-center gap-2">
             <span className="material-symbols-outlined text-primary text-[24px]">star</span>
-            <span className="text-2xl font-bold text-[var(--text-main)]">{userProfile?.xpTotal || 0}</span>
+            <span className="text-2xl font-bold text-[var(--text-main)]">{xp}</span>
             <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] text-center">XP Total</span>
           </div>
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-5 flex flex-col items-center justify-center gap-2 col-span-2">
@@ -121,6 +144,24 @@ export function Perfil() {
             <span className="text-2xl font-bold text-[var(--text-main)]">{completedCount}</span>
             <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] text-center">Tarefas Resolvidas</span>
           </div>
+        </div>
+
+        <h2 className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-muted)] mb-4">Conquistas</h2>
+        <div className="grid grid-cols-1 gap-3">
+          {achievements.map((ach) => (
+            <div key={ach.id} className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${ach.unlocked ? 'bg-[var(--surface)] border-[var(--border)]' : 'bg-transparent border-dashed border-[var(--border)] opacity-60 grayscale'}`}>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${ach.unlocked ? 'bg-primary/20 text-primary' : 'bg-[var(--surface)] text-[var(--text-muted)]'}`}>
+                <span className="material-symbols-outlined text-[24px]">{ach.icon}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-sm font-bold ${ach.unlocked ? 'text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}>{ach.name}</h3>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">{ach.description}</p>
+              </div>
+              {ach.unlocked && (
+                <span className="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </main>
