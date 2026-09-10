@@ -64,7 +64,7 @@ export function Perfil() {
   return (
     <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
       <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
-        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
+        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto">
           <button 
             onClick={() => navigate('/app')}
             className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors flex items-center gap-1 -ml-2 p-2"
@@ -81,7 +81,7 @@ export function Perfil() {
         </div>
       </header>
 
-      <div className="px-5 pb-24 flex flex-col md:max-w-2xl md:mx-auto w-full mt-8">
+      <div className="px-5 pb-24 flex flex-col md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto w-full mt-8">
         <div className="flex flex-col items-center text-center mb-10">
           <div className="relative mb-4 group">
             <input 

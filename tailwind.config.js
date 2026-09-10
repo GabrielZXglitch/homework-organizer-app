@@ -11,6 +11,9 @@ export default {
         sans: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['"Geist Mono"', 'ui-monospace', 'monospace'],
       },
+      screens: {
+        '3xl': '2560px',
+      },
       colors: {
         primary: '#4F46E5',
         'primary-hover': '#4338CA',

@@ -10,14 +10,19 @@ import { Historico } from './pages/Historico';
 import { Perfil } from './pages/Perfil';
 import { BottomNav } from './components/BottomNav';
 
+import { Sidebar } from './components/Sidebar';
+
 function ProtectedRoute({ children, hideNav = false }: { children: React.ReactNode, hideNav?: boolean }) {
   const { currentUser } = useAuth();
   if (!currentUser) return <Navigate to="/login" replace />;
   return (
-    <>
-      {children}
+    <div className="flex min-h-screen bg-[var(--background)] md:pl-[240px] 3xl:pl-[280px]">
+      <Sidebar />
+      <div className="flex-1 w-full min-w-0">
+        {children}
+      </div>
       {!hideNav && <BottomNav />}
-    </>
+    </div>
   );
 }
 

@@ -83,7 +83,7 @@ export function ConcluirDever() {
   return (
     <main className="flex-1 flex flex-col relative w-full bg-[var(--background)] min-h-screen animate-fade-in">
       <header className="sticky top-0 z-50 bg-[var(--background)]/80 backdrop-blur-md pt-safe border-b border-[var(--border)]">
-        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl md:mx-auto">
+        <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto">
           <button 
             type="button" 
             onClick={() => navigate(-1)}
@@ -96,7 +96,7 @@ export function ConcluirDever() {
         </div>
       </header>
 
-      <div className="px-5 pb-12 flex flex-col md:max-w-2xl md:mx-auto w-full gap-8 mt-8">
+      <div className="px-5 pb-12 flex flex-col md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto w-full gap-8 mt-8">
         <div>
           <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] tracking-wider">
             {hw.materia}

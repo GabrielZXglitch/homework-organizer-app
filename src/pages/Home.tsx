@@ -113,7 +113,7 @@ export function Home() {
   }
 
   return (
-    <main className="flex-1 flex flex-col relative w-full px-5 md:max-w-2xl md:mx-auto pb-24 min-h-screen bg-[var(--background)] animate-fade-in">
+    <main className="flex-1 flex flex-col relative w-full px-5 md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto pb-24 min-h-screen bg-[var(--background)] animate-fade-in">
       
       {/* Header & Stats - Sleek / Linear Vibe */}
       <header className="pt-10 pb-6 flex items-end justify-between border-b border-[var(--border)]">
@@ -250,7 +250,7 @@ export function Home() {
 
       {/* Action Bar / FAB */}
       {isSelectionMode ? (
-        <aside className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 bg-[#1a1f2e] p-4 flex items-center justify-between z-40 animate-slide-up shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:max-w-2xl md:mx-auto md:rounded-t-xl">
+        <aside className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0 left-0 md:left-[240px] 3xl:left-[280px] right-0 bg-[#1a1f2e] p-4 flex items-center justify-between z-40 animate-slide-up shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto md:rounded-t-xl">
           <button 
             onClick={cancelSelection}
             className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-4 py-2"
@@ -278,7 +278,7 @@ export function Home() {
           </div>
         </aside>
       ) : (
-        <aside className="fixed bottom-24 right-6 md:right-auto md:left-1/2 md:ml-[160px] z-40 animate-fade-in">
+        <aside className="fixed bottom-24 right-6 md:hidden z-40 animate-fade-in">
           <button 
             onClick={() => navigate('/app/novo')}
             className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--text-main)] text-[var(--background)] font-medium text-sm shadow-glow-subtle hover:scale-105 active:scale-95 transition-transform"
