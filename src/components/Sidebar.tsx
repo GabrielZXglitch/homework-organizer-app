@@ -8,7 +8,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-[240px] 3xl:w-[280px] bg-[var(--surface)] border-r border-[var(--border)] z-50">
       <div className="p-6">
-        <h1 className="text-xl font-bold text-[var(--text-main)]">HomeworkApp</h1>
+        <h1 className="text-xl font-bold text-[var(--text-main)]">Homework Organizer</h1>
       </div>
       
       <nav className="flex-1 px-4 flex flex-col gap-2 mt-4">
