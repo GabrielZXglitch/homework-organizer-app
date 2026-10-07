@@ -41,8 +41,10 @@ export function Home() {
     setShowOnboarding(false);
   };
 
-  const pendingHomeworks = homeworks.filter(hw => hw.status === 'pendente');
-  const displayedHomeworks = filterHomeworksByPeriod(pendingHomeworks, filter);
+  const pendingHomeworks = homeworks.filter(hw => hw.status !== 'concluido');
+  const displayedHomeworks = pendingHomeworks.filter(hw =>
+    hw.status === 'atrasado' || filterHomeworksByPeriod([hw], filter).length > 0
+  );
 
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -233,6 +235,9 @@ export function Home() {
 
               {/* Metadata */}
               <div className="flex items-center gap-4 ml-7 sm:ml-0 shrink-0">
+                {hw.status === 'atrasado' && (
+                  <span className="text-[10px] uppercase font-mono text-[#F87171] bg-[#F87171]/10 px-1.5 py-0.5 rounded">Atrasado</span>
+                )}
                 {hw.prioridade === 'urgente' && (
                   <span className="text-[10px] uppercase font-mono text-[#F87171] bg-[#F87171]/10 px-1.5 py-0.5 rounded">Urgente</span>
                 )}

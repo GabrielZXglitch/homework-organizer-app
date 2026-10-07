@@ -12,7 +12,7 @@ export interface User {
 }
 
 export type HomeworkPriority = 'tranquilo' | 'importante' | 'urgente';
-export type HomeworkStatus = 'pendente' | 'concluido';
+export type HomeworkStatus = 'pendente' | 'atrasado' | 'concluido';
 
 export interface Homework {
   id: string;

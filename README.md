@@ -1,4 +1,27 @@
-# React + TypeScript + Vite
+# Homework Organizer
+
+## Prazos e lembretes
+
+O app verifica os prazos ao carregar os deveres, ao voltar para a aba e enquanto
+estiver aberto. Deveres não concluídos passam a `atrasado` depois da data e hora
+de entrega; a atualização é salva no Firestore com uma transação que preserva
+conclusões concorrentes. Os atrasados permanecem visíveis nas tarefas ativas.
+Ao estender um prazo, o dever volta a `pendente`.
+
+Com permissão de notificações, cada dever recebe um lembrete a partir do início
+do dia anterior (agendado com pelo menos 24 horas de antecedência) e outro a
+partir do início do dia da entrega, no fuso local. O app evita repetir o mesmo
+lembrete por usuário, dever, prazo e etapa. Se o app for aberto depois do horário
+agendado, o lembrete aplicável é emitido ao carregar, desde que o prazo não tenha
+passado. O service worker é usado para exibir notificações em navegadores móveis.
+
+Esses lembretes são locais: não há envio com o app fechado. Para isso, seria
+necessário implementar um agendador no servidor e assinaturas de Web Push.
+Deveres que vencerem com o app fechado serão atualizados no próximo carregamento.
+
+Validação: `npx vitest run` e `yarn build`.
+
+## Template original
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

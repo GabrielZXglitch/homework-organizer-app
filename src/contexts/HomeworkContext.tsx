@@ -1,9 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import { db } from '../lib/firebase';
-import { collection, query, where, onSnapshot, doc, setDoc, writeBatch, Timestamp, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, writeBatch, runTransaction, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { calculateXP, calculateStreak } from '../utils/gamification';
 import type { Homework, HomeworkStatus } from '../types';
+import { deadlineDate, effectiveStatus, nextTimingCheck } from '../utils/homeworkTiming';
+import { notifyHomework } from '../utils/homeworkNotifications';
 
 interface HomeworkContextType {
   homeworks: Homework[];
@@ -23,30 +25,59 @@ export function useHomeworks() {
 
 export function HomeworkProvider({ children }: { children: ReactNode }) {
   const { currentUser, userProfile } = useAuth();
-  const [homeworks, setHomeworks] = useState<Homework[]>([]);
+  const [storedHomeworks, setHomeworks] = useState<Homework[]>([]);
+  const [now, setNow] = useState(() => new Date());
+  const homeworks = useMemo(() => storedHomeworks.map(hw => ({
+    ...hw, status: effectiveStatus(hw, now),
+  })), [storedHomeworks, now]);
   const [loading, setLoading] = useState(true);
 
-  // Local Notification Logic
+  // Recheck on load, at time boundaries, and when returning to the app.
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      const isToday = (date: Date) => {
-        const today = new Date();
-        return date.getDate() === today.getDate() &&
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear();
-      };
-      const hasPendingToday = homeworks.some(hw => hw.status === 'pendente' && isToday(hw.prazo instanceof Timestamp ? hw.prazo.toDate() : new Date(hw.prazo)));
-      const alreadyNotified = localStorage.getItem('notified_today') === new Date().toDateString();
+    if (!currentUser) return;
+    let active = true;
+    const inFlight = new Set<string>();
+    let timer: ReturnType<typeof setTimeout>;
 
-      if (hasPendingToday && !alreadyNotified) {
-        new Notification('Lembrete de Dever', {
-          body: 'Você tem tarefas pendentes para entregar hoje! Não deixe para a última hora.',
-          icon: '/logo.png'
-        });
-        localStorage.setItem('notified_today', new Date().toDateString());
+    const check = () => {
+      clearTimeout(timer);
+      const checkTime = new Date();
+      setNow(checkTime);
+      for (const hw of storedHomeworks) {
+        if (hw.userId !== currentUser.uid || inFlight.has(hw.id)) continue;
+        inFlight.add(hw.id);
+        const sync = async () => {
+          const status = effectiveStatus(hw, checkTime);
+          if (status !== hw.status) {
+            // Read the latest document so expiration cannot overwrite a concurrent completion.
+            await runTransaction(db, async transaction => {
+              const ref = doc(db, 'homeworks', hw.id);
+              const snapshot = await transaction.get(ref);
+              if (!snapshot.exists() || !active) return;
+              const latest = snapshot.data() as Homework;
+              if (latest.userId !== currentUser.uid) return;
+              const latestStatus = effectiveStatus(latest, new Date());
+              if (latest.status !== latestStatus) transaction.update(ref, { status: latestStatus });
+            });
+          }
+          if (active) await notifyHomework(hw, checkTime, () => active);
+        };
+        void sync().catch(error => console.error('Erro ao atualizar prazo/lembrete:', error))
+          .finally(() => inFlight.delete(hw.id));
       }
-    }
-  }, [homeworks]);
+      timer = setTimeout(check, nextTimingCheck(storedHomeworks, checkTime));
+    };
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    check();
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      window.removeEventListener('focus', check);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [currentUser, storedHomeworks]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -55,6 +86,8 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    setHomeworks([]);
+    setLoading(true);
     const q = query(
       collection(db, 'homeworks'),
       where('userId', '==', currentUser.uid)
@@ -67,8 +100,8 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
       });
       // Sort by prazo asc locally
       hws.sort((a, b) => {
-        const da = a.prazo instanceof Timestamp ? a.prazo.toMillis() : (a.prazo as Date).getTime();
-        const dbTime = b.prazo instanceof Timestamp ? b.prazo.toMillis() : (b.prazo as Date).getTime();
+        const da = deadlineDate(a.prazo).getTime();
+        const dbTime = deadlineDate(b.prazo).getTime();
         return da - dbTime;
       });
       setHomeworks(hws);
@@ -85,7 +118,7 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
       ...hwData,
       id: newDocRef.id,
       userId: currentUser.uid,
-      status: 'pendente',
+      status: effectiveStatus({ status: 'pendente', prazo: hwData.prazo }, new Date()),
       dataConclusao: null,
       xpGanho: null,
       createdAt: new Date()
