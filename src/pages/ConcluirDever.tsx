@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
+import { prepareHomeworkPhoto, photoPayload, type HomeworkPhoto } from '../utils/homeworkPhotos';
 
 export function ConcluirDever() {
   const { id } = useParams();
@@ -9,9 +10,18 @@ export function ConcluirDever() {
   const { homeworks, completeHomework } = useHomeworks();
   
   const hw = homeworks.find(h => h.id === id);
-  const [photoData, setPhotoData] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<HomeworkPhoto[]>([]);
+  const [isPreparing, setIsPreparing] = useState(false);
+  const [error, setError] = useState('');
+  const [progress, setProgress] = useState('');
+  const busyRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const navigationTimer = useRef<ReturnType<typeof setTimeout>>();
+  const busy = isPreparing || isSubmitting;
+
+  useEffect(() => () => clearTimeout(navigationTimer.current), []);
 
   useEffect(() => {
     if (!hw) navigate('/app');
@@ -19,65 +29,80 @@ export function ConcluirDever() {
 
   if (!hw) return null;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        if (evt.target?.result) setPhotoData(evt.target.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (busyRef.current || files.length === 0) return;
+    busyRef.current = true;
+    setIsPreparing(true);
+    setError('');
+    const added: HomeworkPhoto[] = [];
+    const errors: string[] = [];
+    try {
+      // Sequential preparation preserves page order and limits peak memory use.
+      for (const file of files) {
+        try {
+          added.push(await prepareHomeworkPhoto(file));
+        } catch (cause) {
+          errors.push(`${file.name}: ${cause instanceof Error ? cause.message : 'Não foi possível preparar a foto.'}`);
+        }
+      }
+      setPhotos(previous => [...previous, ...added]);
+      setError(errors.join(' '));
+    } finally {
+      busyRef.current = false;
+      setIsPreparing(false);
     }
   };
 
   const handleConfirm = async () => {
-    if (hw.exigeFoto && !photoData) {
-      alert("Comprovante visual exigido.");
+    if (busyRef.current || hw.status === 'concluido') return;
+    if (hw.exigeFoto && photos.length === 0) {
+      setError('Adicione pelo menos uma foto do dever.');
       return;
     }
-
+    busyRef.current = true;
     setIsSubmitting(true);
-    
-    if (photoData) {
-      try {
-        const base64Data = photoData.split(',')[1];
-        const mimeType = photoData.split(';')[0].split(':')[1];
-
-        const response = await fetch('/api/verify-photo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ base64Data, mimeType })
-        });
-        
-        if (!response.ok) throw new Error('Erro na rede');
-
-        const { aprovado } = await response.json();
-        
-        if (!aprovado) {
-          alert('Validação falhou. Certifique-se de que a imagem contenha material de estudo válido.');
-          setIsSubmitting(false);
-          return;
+    setError('');
+    let completed = false;
+    try {
+      for (let index = 0; index < photos.length; index++) {
+        setProgress(`Validando foto ${index + 1} de ${photos.length}...`);
+        let approved = false;
+        try {
+          const response = await fetch('/api/verify-photo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(photoPayload(photos[index].dataUrl)),
+          });
+          if (!response.ok) throw new Error('Erro na rede');
+          approved = (await response.json()).aprovado === true;
+        } catch {
+          throw new Error(`Erro ao validar a foto ${index + 1}. Verifique sua conexão e tente novamente.`);
         }
-      } catch (error) {
-        console.error("Verification error:", error);
-        alert('Erro ao validar imagem.');
+        if (!approved) {
+          throw new Error(`A foto ${index + 1} não foi aprovada. Confira se mostra material de estudo legível e remova ou substitua essa foto.`);
+        }
+      }
+      setProgress('Salvando...');
+      try {
+        await completeHomework(hw.id, photos.length > 0);
+      } catch {
+        throw new Error('Não foi possível salvar a conclusão. Suas fotos foram mantidas. Tente novamente.');
+      }
+      completed = true;
+      setProgress('Concluído!');
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#4F46E5', '#10B981', '#FFFFFF'] });
+      navigationTimer.current = setTimeout(() => navigate('/app'), 1000);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Não foi possível concluir o dever.');
+    } finally {
+      if (!completed) {
+        busyRef.current = false;
         setIsSubmitting(false);
-        return;
+        setProgress('');
       }
     }
-
-    confetti({
-      particleCount: 80,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#4F46E5', '#10B981', '#FFFFFF']
-    });
-
-    await completeHomework(hw.id, !!photoData);
-    
-    setTimeout(() => {
-      navigate('/app');
-    }, 1000);
   };
 
   return (
@@ -86,6 +111,7 @@ export function ConcluirDever() {
         <div className="h-14 px-5 flex items-center justify-between md:max-w-2xl xl:max-w-[800px] 3xl:max-w-[1000px] md:mx-auto">
           <button 
             type="button" 
+            disabled={busy}
             onClick={() => navigate(-1)}
             className="flex items-center gap-1 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-sm font-medium"
           >
@@ -105,41 +131,47 @@ export function ConcluirDever() {
         </div>
 
         {hw.exigeFoto ? (
-          <div className="relative">
-            <input 
-              type="file" 
-              accept="image/*" 
-              capture="environment" 
-              className="hidden" 
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
-            
-            <button 
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full relative overflow-hidden focus:outline-none rounded-lg group text-left"
-            >
-              {!photoData ? (
-                <div className="w-full aspect-[4/3] rounded-lg bg-[var(--surface)] flex flex-col items-center justify-center p-6 border border-dashed border-[var(--border)] hover:border-primary/50 transition-colors">
-                  <span className="material-symbols-outlined text-[32px] text-[var(--text-muted)] mb-3 group-hover:text-primary transition-colors">add_photo_alternate</span>
-                  <p className="text-sm font-medium text-[var(--text-main)]">Enviar Comprovante</p>
-                  <p className="text-[10px] font-mono text-[var(--text-muted)] uppercase mt-2">Obrigatório</p>
-                </div>
-              ) : (
-                <div className="w-full aspect-[4/3] rounded-lg shadow-sm overflow-hidden relative border border-[var(--border)]">
-                  <img className="w-full h-full object-cover" src={photoData} alt="Preview" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white text-sm font-medium">Trocar Imagem</span>
-                  </div>
-                  <div className="absolute top-3 right-3 bg-secondary/90 backdrop-blur-md px-2 py-1 rounded flex items-center gap-1 shadow-sm">
-                    <span className="material-symbols-outlined text-white text-[14px]">done</span>
-                    <span className="text-[10px] font-mono uppercase text-white">Anexado</span>
-                  </div>
-                </div>
-              )}
-            </button>
-          </div>
+          <section className="flex flex-col gap-4" aria-label="Fotos do dever">
+            <input type="file" accept="image/*" multiple className="hidden"
+              aria-label="Selecionar fotos" ref={fileInputRef} onChange={handleFileChange} disabled={busy} />
+            <input type="file" accept="image/*" capture="environment" className="hidden"
+              aria-label="Tirar foto" ref={cameraInputRef} onChange={handleFileChange} disabled={busy} />
+            <div>
+              <h3 className="text-sm font-medium text-[var(--text-main)]">Fotos do dever</h3>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Adicione uma foto de cada página feita. Pelo menos uma foto é obrigatória.</p>
+            </div>
+            {photos.length > 0 && (
+              <>
+                <p className="text-xs text-[var(--text-muted)]" aria-live="polite">{photos.length} {photos.length === 1 ? 'foto anexada' : 'fotos anexadas'}</p>
+                <ol className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {photos.map((photo, index) => (
+                    <li key={photo.id} className="rounded-lg border border-[var(--border)] overflow-hidden bg-[var(--surface)]">
+                      <img className="w-full aspect-[3/4] object-contain" src={photo.dataUrl} alt={`Página ${index + 1}: ${photo.name}`} />
+                      <div className="flex items-center justify-between gap-2 p-2">
+                        <span className="text-xs text-[var(--text-main)]">Página {index + 1}</span>
+                        <button type="button" disabled={busy} aria-label={`Remover foto ${index + 1}`}
+                          className="text-xs text-[var(--text-muted)] hover:text-red-500 disabled:opacity-50 min-h-11 px-2"
+                          onClick={() => { setPhotos(previous => previous.filter(item => item.id !== photo.id)); setError(''); }}>
+                          Remover
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )}
+            <div className="flex flex-wrap gap-3">
+              <button type="button" disabled={busy} onClick={() => fileInputRef.current?.click()}
+                className="flex-1 min-h-11 px-4 py-3 rounded-lg border border-dashed border-[var(--border)] text-sm text-[var(--text-main)] hover:border-primary disabled:opacity-50">
+                {photos.length ? 'Adicionar mais fotos' : 'Selecionar fotos'}
+              </button>
+              <button type="button" disabled={busy} onClick={() => cameraInputRef.current?.click()}
+                className="min-h-11 px-4 py-3 rounded-lg border border-[var(--border)] text-sm text-[var(--text-main)] disabled:opacity-50">
+                Tirar foto
+              </button>
+            </div>
+            {isPreparing && <p role="status" className="text-sm text-[var(--text-muted)]">Preparando fotos...</p>}
+          </section>
         ) : (
           <div className="bg-[var(--surface)] p-6 rounded-lg border border-[var(--border)] flex items-start gap-3">
             <span className="material-symbols-outlined text-[var(--text-muted)]">info</span>
@@ -151,15 +183,16 @@ export function ConcluirDever() {
         )}
 
         <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[var(--border)]">
+          {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
           <button 
             className="w-full h-11 bg-[var(--text-main)] text-[var(--background)] font-medium text-sm rounded-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 shadow-glow-subtle" 
             onClick={handleConfirm} 
-            disabled={isSubmitting || (hw.exigeFoto && !photoData)}
+            disabled={busy || hw.status === 'concluido' || (hw.exigeFoto && photos.length === 0)}
           >
             {isSubmitting ? (
               <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
             ) : null}
-            <span>{isSubmitting ? 'Validando...' : 'Marcar como Concluído'}</span>
+            <span>{isSubmitting ? progress : 'Marcar como Concluído'}</span>
           </button>
         </div>
       </div>

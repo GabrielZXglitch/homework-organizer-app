@@ -127,10 +127,11 @@ export function HomeworkProvider({ children }: { children: ReactNode }) {
   }
 
   async function completeHomework(homeworkId: string, withPhoto: boolean) {
-    if (!currentUser || !userProfile) return;
+    if (!currentUser || !userProfile) throw new Error('Aguarde seu perfil carregar ou entre novamente.');
     
     const hw = homeworks.find(h => h.id === homeworkId);
-    if (!hw || hw.status === 'concluido') return;
+    if (!hw) throw new Error('Dever não encontrado.');
+    if (hw.status === 'concluido') return;
 
     const batch = writeBatch(db);
 

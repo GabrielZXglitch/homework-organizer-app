@@ -1,5 +1,14 @@
 # Homework Organizer
 
+## Fotos ao concluir
+
+Na tela “Resolver Tarefa”, selecione várias fotos da galeria ou tire fotos de
+cada página. Novas seleções acrescentam páginas; cada foto pode ser removida
+antes do envio. As imagens são preparadas no navegador e validadas uma a uma.
+O dever só é concluído quando todas passam na validação, com o mesmo bônus de
+XP de uma única foto. Em caso de erro, as fotos permanecem na tela para tentar
+novamente. Elas não são armazenadas no histórico e são descartadas ao sair.
+
 ## Prazos e lembretes
 
 O app verifica os prazos ao carregar os deveres, ao voltar para a aba e enquanto
