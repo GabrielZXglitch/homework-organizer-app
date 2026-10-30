@@ -80,3 +80,11 @@ export default tseslint.config({
   },
 })
 ```
+
+## Licença
+
+O código original do Homework Organizer é distribuído sob a
+[licença MIT](LICENSE), com copyright © 2026 GabrielZXglitch.
+
+Dependências, ferramentas e materiais de terceiros mantêm suas respectivas
+licenças e atribuições. Consulte os [avisos de terceiros](THIRD_PARTY_NOTICES.md).
