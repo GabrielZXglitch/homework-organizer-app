@@ -25,3 +25,6 @@ dist-ssr
 .vercel
 .env
 .env*
+
+# Share only placeholder configuration, never real environment files.
+!.env.example

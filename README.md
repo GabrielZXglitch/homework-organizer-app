@@ -88,3 +88,11 @@ O código original do Homework Organizer é distribuído sob a
 
 Dependências, ferramentas e materiais de terceiros mantêm suas respectivas
 licenças e atribuições. Consulte os [avisos de terceiros](THIRD_PARTY_NOTICES.md).
+
+## Configuração e segurança
+
+A validação de fotos usa **Groq**, com `GROQ_API_KEY` somente no servidor.
+Use [`.env.example`](.env.example) como referência para configurar o Firebase e
+a função de validação. Não versione arquivos com valores reais.
+Consulte [SECURITY.md](SECURITY.md) para a migração das configurações e as ações
+manuais necessárias para credenciais expostas no histórico.
