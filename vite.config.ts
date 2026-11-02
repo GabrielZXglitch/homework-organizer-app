@@ -7,6 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Load the large HEIF decoder on demand instead of precaching it.
+      workbox: { globIgnores: ['**/heic-to-*.js'] },
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Homework Organizer',

@@ -81,7 +81,7 @@ export function ConcluirDever() {
           throw new Error(`Erro ao validar a foto ${index + 1}. Verifique sua conexão e tente novamente.`);
         }
         if (!approved) {
-          throw new Error(`A foto ${index + 1} não foi aprovada. Confira se mostra material de estudo legível e remova ou substitua essa foto.`);
+          throw new Error(`A foto ${index + 1} não foi aprovada. Confira se mostra o caderno, livro ou atividade na foto. Não é necessário ter letra bonita nem conseguir ler cada palavra. Se o material não aparece no enquadramento, tire outra foto.`);
         }
       }
       setProgress('Salvando...');
@@ -132,13 +132,14 @@ export function ConcluirDever() {
 
         {hw.exigeFoto ? (
           <section className="flex flex-col gap-4" aria-label="Fotos do dever">
-            <input type="file" accept="image/*" multiple className="hidden"
+            <input type="file" accept="image/*,.heic,.heif,.hif" multiple className="hidden"
               aria-label="Selecionar fotos" ref={fileInputRef} onChange={handleFileChange} disabled={busy} />
-            <input type="file" accept="image/*" capture="environment" className="hidden"
+            <input type="file" accept="image/*,.heic,.heif,.hif" capture="environment" className="hidden"
               aria-label="Tirar foto" ref={cameraInputRef} onChange={handleFileChange} disabled={busy} />
             <div>
               <h3 className="text-sm font-medium text-[var(--text-main)]">Fotos do dever</h3>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Adicione uma foto de cada página feita. Pelo menos uma foto é obrigatória.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Adicione uma foto de cada página feita. Sua letra não precisa ser perfeita.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Aceita HEIC/HEIF, JPG, PNG e outros formatos de imagem compatíveis.</p>
             </div>
             {photos.length > 0 && (
               <>

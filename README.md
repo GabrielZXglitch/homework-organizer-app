@@ -5,6 +5,16 @@
 Na tela “Resolver Tarefa”, selecione várias fotos da galeria ou tire fotos de
 cada página. Novas seleções acrescentam páginas; cada foto pode ser removida
 antes do envio. As imagens são preparadas no navegador e validadas uma a uma.
+Fotos HEIC/HEIF são convertidas automaticamente no aparelho quando o navegador
+não consegue abri-las. JPG, PNG, WebP e outros formatos decodificáveis pelo
+navegador também são aceitos. A conversão não exige um serviço externo. O
+conversor é carregado sob demanda e precisa de conexão no primeiro uso.
+
+A IA procura material de estudo, sem avaliar caligrafia, ortografia ou respostas.
+Letra difícil de ler não deve ser motivo de reprovação quando o contexto da
+página mostra uma atividade. Isso é uma orientação ao modelo, não garantia de
+que a IA nunca erre.
+
 O dever só é concluído quando todas passam na validação, com o mesmo bônus de
 XP de uma única foto. Em caso de erro, as fotos permanecem na tela para tentar
 novamente. Elas não são armazenadas no histórico e são descartadas ao sair.

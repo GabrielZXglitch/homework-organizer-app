@@ -40,3 +40,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Conversão de HEIC/HEIF
+
+O conversor `heic-to` 1.6.7, de Hopper Gee e contribuidores, é distribuído sob
+LGPL-3.0-or-later e utiliza libheif 1.23.7. Ele é carregado como um módulo
+separado, apenas quando o navegador não consegue abrir uma foto HEIC/HEIF.
+O código original do Homework Organizer continua sob MIT; a biblioteca mantém
+sua própria licença. Modificações e substituições dessa biblioteca são permitidas
+nos termos da LGPL, inclusive a engenharia reversa para depurar modificações.
+
+- [Aviso e licença LGPL do conversor](public/licenses/heic-to-LICENSE.txt)
+- [GPL versão 3, incorporada por referência na LGPL](public/licenses/GPL-3.0.txt)
+- [Código-fonte exato do heic-to utilizado](https://github.com/hoppergee/heic-to/tree/78345a3fcdb4a1d70d513fce2646aeff0127f7ba)
+- [Código-fonte e instruções de compilação da libheif](https://github.com/strukturag/libheif/tree/v1.23.7)
+
+O conversor é usado sem alterações. Seus avisos de licença são distribuídos
+junto ao app em `/licenses/`. Os fontes upstream incluem os scripts de compilação
+para reconstruir e substituir o módulo de conversão.

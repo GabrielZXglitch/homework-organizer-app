@@ -2,9 +2,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MAX_PHOTO_REQUEST_BYTES, photoPayload, prepareHomeworkPhoto } from '../src/utils/homeworkPhotos';
 
+const heicTo = vi.hoisted(() => vi.fn());
+vi.mock('heic-to', () => ({ heicTo }));
 const drawImage = vi.fn();
 const encode = vi.fn();
 beforeEach(() => {
+  heicTo.mockReset().mockResolvedValue(new Blob(['converted'], { type: 'image/png' }));
   vi.stubGlobal('Image', class {
     naturalWidth = 4000;
     naturalHeight = 3000;
@@ -47,7 +50,49 @@ describe('photo preparation', () => {
       onerror = () => {};
       set src(_value: string) { queueMicrotask(() => this.onerror()); }
     });
-    await expect(prepareHomeworkPhoto(new File(['bad'], 'page.heic', { type: 'image/heic' }))).rejects.toThrow('Não foi possível ler');
+    await expect(prepareHomeworkPhoto(new File(['bad'], 'page.jpg', { type: 'image/jpeg' }))).rejects.toThrow('Não foi possível ler');
     expect(URL.revokeObjectURL).toHaveBeenCalled();
   });
+  it('uses native HEIC support without loading the converter when available', async () => {
+    await prepareHomeworkPhoto(new File(['native'], 'page.heic', { type: 'image/heic' }));
+    expect(heicTo).not.toHaveBeenCalled();
+  });
+  it.each([
+    ['page.heic', 'image/heic'], ['page.heif', 'image/heif'],
+    ['PAGE.HEIC', ''], ['page.HEIF', 'application/octet-stream'],
+    ['page.hif', ''], ['page', 'image/heic-sequence'],
+  ])('converts %s (%s) when the browser cannot decode it', async (name, type) => {
+    let loads = 0;
+    vi.stubGlobal('Image', class {
+      naturalWidth = 4000;
+      naturalHeight = 3000;
+      onload = () => {};
+      onerror = () => {};
+      set src(_value: string) {
+        const first = loads++ === 0;
+        queueMicrotask(() => first ? this.onerror() : this.onload());
+      }
+    });
+    const original = new File(['photo'], name, { type });
+    const result = await prepareHomeworkPhoto(original);
+    expect(heicTo).toHaveBeenCalledWith({ blob: original, type: 'image/png' });
+    expect(result.name).toBe(name);
+    expect(photoPayload(result.dataUrl).mimeType).toBe('image/jpeg');
+    expect(URL.revokeObjectURL).toHaveBeenCalledTimes(2);
+  });
+  it('reports corrupt HEIF files without leaking decoder errors', async () => {
+    vi.stubGlobal('Image', class {
+      onerror = () => {};
+      set src(_value: string) { queueMicrotask(() => this.onerror()); }
+    });
+    heicTo.mockRejectedValue(new Error('internal decoder details'));
+    await expect(prepareHomeworkPhoto(new File(['bad'], 'bad.heif', { type: 'image/heif' })))
+      .rejects.toThrow('Não foi possível converter esta foto HEIC/HEIF');
+    expect(URL.revokeObjectURL).toHaveBeenCalledTimes(1);
+  });
+  it.each(['jpg', 'png', 'webp', 'avif', 'gif', 'bmp'])('accepts %s when the phone omits the MIME type', async extension => {
+    await prepareHomeworkPhoto(new File(['photo'], `page.${extension}`, { type: '' }));
+    expect(heicTo).not.toHaveBeenCalled();
+  });
+
 });
