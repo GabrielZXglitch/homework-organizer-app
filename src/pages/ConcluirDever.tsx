@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useHomeworks } from '../contexts/HomeworkContext';
 import confetti from 'canvas-confetti';
-import { prepareHomeworkPhoto, photoPayload, type HomeworkPhoto } from '../utils/homeworkPhotos';
+import { PhotoVerificationError, verifyHomeworkPhoto } from '../utils/verifyHomeworkPhoto';
+import { prepareHomeworkPhoto, type HomeworkPhoto } from '../utils/homeworkPhotos';
 
 export function ConcluirDever() {
   const { id } = useParams();
@@ -15,13 +16,40 @@ export function ConcluirDever() {
   const [error, setError] = useState('');
   const [progress, setProgress] = useState('');
   const busyRef = useRef(false);
+  const approvedPhotos = useRef(new Set<string>());
+  const session = useRef(0);
+  const activeRequest = useRef<AbortController>();
+  const cooldownUntil = useRef(0);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const navigationTimer = useRef<ReturnType<typeof setTimeout>>();
   const busy = isPreparing || isSubmitting;
 
-  useEffect(() => () => clearTimeout(navigationTimer.current), []);
+  useEffect(() => {
+    session.current += 1;
+    approvedPhotos.current.clear();
+    setPhotos([]);
+    setError('');
+    setProgress('');
+    busyRef.current = false;
+    setIsPreparing(false);
+    setIsSubmitting(false);
+    return () => {
+      session.current += 1;
+      activeRequest.current?.abort();
+      clearTimeout(navigationTimer.current);
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownSeconds(Math.max(0, Math.ceil((cooldownUntil.current - Date.now()) / 1000)));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownSeconds]);
 
   useEffect(() => {
     if (!hw) navigate('/app');
@@ -34,6 +62,7 @@ export function ConcluirDever() {
     e.target.value = '';
     if (busyRef.current || files.length === 0) return;
     busyRef.current = true;
+    const currentSession = session.current;
     setIsPreparing(true);
     setError('');
     const added: HomeworkPhoto[] = [];
@@ -47,57 +76,64 @@ export function ConcluirDever() {
           errors.push(`${file.name}: ${cause instanceof Error ? cause.message : 'Não foi possível preparar a foto.'}`);
         }
       }
+      if (session.current !== currentSession) return;
       setPhotos(previous => [...previous, ...added]);
       setError(errors.join(' '));
     } finally {
-      busyRef.current = false;
-      setIsPreparing(false);
+      if (session.current === currentSession) {
+        busyRef.current = false;
+        setIsPreparing(false);
+      }
     }
   };
 
   const handleConfirm = async () => {
-    if (busyRef.current || hw.status === 'concluido') return;
+    if (busyRef.current || hw.status === 'concluido' || Date.now() < cooldownUntil.current) return;
     if (hw.exigeFoto && photos.length === 0) {
       setError('Adicione pelo menos uma foto do dever.');
       return;
     }
     busyRef.current = true;
+    const currentSession = session.current;
     setIsSubmitting(true);
     setError('');
     let completed = false;
     try {
       for (let index = 0; index < photos.length; index++) {
+        const photo = photos[index];
+        if (approvedPhotos.current.has(photo.id)) continue;
         setProgress(`Validando foto ${index + 1} de ${photos.length}...`);
-        let approved = false;
-        try {
-          const response = await fetch('/api/verify-photo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(photoPayload(photos[index].dataUrl)),
-          });
-          if (!response.ok) throw new Error('Erro na rede');
-          approved = (await response.json()).aprovado === true;
-        } catch {
-          throw new Error(`Erro ao validar a foto ${index + 1}. Verifique sua conexão e tente novamente.`);
-        }
+        const controller = new AbortController();
+        activeRequest.current = controller;
+        const approved = await verifyHomeworkPhoto(photo.dataUrl, index, controller);
+        if (session.current !== currentSession) return;
         if (!approved) {
           throw new Error(`A foto ${index + 1} não foi aprovada. Confira se mostra o caderno, livro ou atividade na foto. Não é necessário ter letra bonita nem conseguir ler cada palavra. Se o material não aparece no enquadramento, tire outra foto.`);
         }
+        approvedPhotos.current.add(photo.id);
       }
+      if (session.current !== currentSession) return;
       setProgress('Salvando...');
       try {
         await completeHomework(hw.id, photos.length > 0);
       } catch {
         throw new Error('Não foi possível salvar a conclusão. Suas fotos foram mantidas. Tente novamente.');
       }
+      if (session.current !== currentSession) return;
       completed = true;
       setProgress('Concluído!');
       confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#4F46E5', '#10B981', '#FFFFFF'] });
       navigationTimer.current = setTimeout(() => navigate('/app'), 1000);
     } catch (cause) {
+      if (session.current !== currentSession) return;
+      if (cause instanceof PhotoVerificationError && cause.retryAfterSeconds !== undefined) {
+        cooldownUntil.current = Date.now() + cause.retryAfterSeconds * 1000;
+        setCooldownSeconds(cause.retryAfterSeconds);
+      }
       setError(cause instanceof Error ? cause.message : 'Não foi possível concluir o dever.');
     } finally {
-      if (!completed) {
+      if (session.current === currentSession) activeRequest.current = undefined;
+      if (!completed && session.current === currentSession) {
         busyRef.current = false;
         setIsSubmitting(false);
         setProgress('');
@@ -152,7 +188,7 @@ export function ConcluirDever() {
                         <span className="text-xs text-[var(--text-main)]">Página {index + 1}</span>
                         <button type="button" disabled={busy} aria-label={`Remover foto ${index + 1}`}
                           className="text-xs text-[var(--text-muted)] hover:text-red-500 disabled:opacity-50 min-h-11 px-2"
-                          onClick={() => { setPhotos(previous => previous.filter(item => item.id !== photo.id)); setError(''); }}>
+                          onClick={() => { approvedPhotos.current.delete(photo.id); setPhotos(previous => previous.filter(item => item.id !== photo.id)); setError(''); }}>
                           Remover
                         </button>
                       </div>
@@ -184,16 +220,17 @@ export function ConcluirDever() {
         )}
 
         <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-[var(--border)]">
+          {cooldownSeconds > 0 && <p role="status" className="text-sm text-[var(--text-muted)]">Você poderá continuar em {cooldownSeconds}s. As fotos aprovadas serão mantidas nesta tela.</p>}
           {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
           <button 
             className="w-full h-11 bg-[var(--text-main)] text-[var(--background)] font-medium text-sm rounded-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 shadow-glow-subtle" 
             onClick={handleConfirm} 
-            disabled={busy || hw.status === 'concluido' || (hw.exigeFoto && photos.length === 0)}
+            disabled={busy || cooldownSeconds > 0 || hw.status === 'concluido' || (hw.exigeFoto && photos.length === 0)}
           >
             {isSubmitting ? (
               <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
             ) : null}
-            <span>{isSubmitting ? progress : 'Marcar como Concluído'}</span>
+            <span>{isSubmitting ? progress : cooldownSeconds > 0 ? `Aguarde ${cooldownSeconds}s` : 'Marcar como Concluído'}</span>
           </button>
         </div>
       </div>

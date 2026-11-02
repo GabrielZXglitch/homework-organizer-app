@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import handler from '../api/verify-photo';
+import handler, { retryAfterSeconds } from '../api/verify-photo';
 
 const fetchMock = vi.fn();
 const photo = { base64Data: 'unit-test-image', mimeType: 'image/jpeg' };
@@ -21,9 +21,51 @@ beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
-afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
+afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 
 describe('Groq photo verification', () => {
+  it.each([
+    ['120', 120], ['86400', 86400], ['0', 0], ['1.5', 2],
+    [null, 60], ['invalid', 60], ['-1', 60],
+    ['Mon, 02 Nov 2026 18:02:00 GMT', 120],
+    ['Mon, 02 Nov 2026 17:59:00 GMT', 0],
+  ])('parses Retry-After %s without shortening long waits', (header, seconds) => {
+    expect(retryAfterSeconds(header, Date.parse('2026-11-02T18:00:00Z'))).toBe(seconds);
+  });
+  it('preserves 429 without reading the provider body or retrying', async () => {
+    const rawBody = vi.fn();
+    fetchMock.mockResolvedValue({ ok: false, status: 429, headers: new Headers({ 'Retry-After': '3600' }), json: rawBody });
+    const res = await verify();
+    expect(res.status).toHaveBeenCalledWith(429);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'RATE_LIMITED', retryAfterSeconds: 3600 }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(rawBody).not.toHaveBeenCalled();
+  });
+  it('aborts after 20 seconds with a safe timeout response and no retries', async () => {
+    vi.useFakeTimers();
+    fetchMock.mockImplementation((_url, options) => new Promise((_resolve, reject) => {
+      options.signal.addEventListener('abort', () => reject(new Error('sensitive-provider-data')));
+    }));
+    const pending = verify();
+    await vi.advanceTimersByTimeAsync(20_000);
+    const res = await pending;
+    expect(res.status).toHaveBeenCalledWith(504);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'VALIDATION_TIMEOUT' }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain('sensitive');
+  });
+  it('rejects oversized photos before contacting the provider', async () => {
+    const res = await verify({ ...photo, base64Data: 'a'.repeat(4_000_000) });
+    expect(res.status).toHaveBeenCalledWith(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+  it.each(['YES NO', 'not YES', 'YES, approved', '', null])('does not treat ambiguous output %s as approval', async content => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ choices: [{ message: { content } }] }) });
+    const res = await verify();
+    expect(res.status).toHaveBeenCalledWith(502);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'INVALID_RESPONSE' }));
+  });
   it.each([['YES', true], ['NO', false]])('preserves the verification result for %s', async (content, approved) => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ choices: [{ message: { content } }] }) });
     const res = await verify();

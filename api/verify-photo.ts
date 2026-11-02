@@ -1,19 +1,37 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+export function retryAfterSeconds(value: string | null, now = Date.now()): number {
+  if (value && /^\d+(?:\.\d+)?$/.test(value.trim())) {
+    const seconds = Number(value);
+    if (Number.isFinite(seconds)) return Math.ceil(seconds);
+  }
+  if (value && /^[a-z]{3,9}[, ]/i.test(value.trim())) {
+    const date = Date.parse(value);
+    if (Number.isFinite(date)) return Math.max(0, Math.ceil((date - now) / 1000));
+  }
+  return 60;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { base64Data, mimeType } = req.body || {};
   if (typeof base64Data !== 'string' || !base64Data || typeof mimeType !== 'string' || !mimeType.startsWith('image/')) {
-    return res.status(400).json({ error: 'Envie uma imagem válida.' });
+    return res.status(400).json({ code: 'INVALID_PHOTO', error: 'Envie uma imagem válida.' });
+  }
+  if (Buffer.byteLength(JSON.stringify({ base64Data, mimeType }), 'utf8') >= 4_000_000) {
+    return res.status(413).json({ code: 'PHOTO_TOO_LARGE', error: 'A foto é muito grande. Escolha uma imagem menor.' });
   }
   if (!process.env.GROQ_API_KEY) {
-    return res.status(503).json({ error: 'Validação de fotos indisponível. Tente novamente mais tarde.' });
+    return res.status(503).json({ code: 'VALIDATION_UNAVAILABLE', error: 'Validação de fotos indisponível. Tente novamente mais tarde.' });
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
@@ -34,19 +52,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!response.ok) {
       // Never log credentials, submitted photos or raw provider responses.
       console.error('Falha na validação Groq. Status HTTP:', response.status);
-      return res.status(502).json({ error: 'Erro ao validar a imagem. Tente novamente.' });
+      if (response.status === 429) {
+        return res.status(429).json({
+          code: 'RATE_LIMITED',
+          error: 'Limite temporário de validação atingido. Aguarde para tentar novamente.',
+          retryAfterSeconds: retryAfterSeconds(response.headers.get('retry-after')),
+        });
+      }
+      return res.status(502).json({ code: 'VALIDATION_FAILED', error: 'Erro ao validar a imagem. Tente novamente.' });
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
-    if (typeof content !== 'string' || !content.trim()) {
-      return res.status(502).json({ error: 'Resposta de validação indisponível. Tente novamente.' });
+    const text = typeof content === 'string' ? content.trim().toUpperCase() : '';
+    if (text !== 'YES' && text !== 'NO') {
+      return res.status(502).json({ code: 'INVALID_RESPONSE', error: 'Resposta de validação indisponível. Tente novamente.' });
     }
-    const text = content.trim().toUpperCase();
-    return res.json({ aprovado: text.includes('YES') });
+    return res.json({ aprovado: text === 'YES' });
   } catch {
     // Errors can contain request headers or provider payloads: do not log them.
     console.error('Não foi possível consultar a validação Groq.');
-    return res.status(502).json({ error: 'Erro ao validar a imagem. Tente novamente.' });
+    if (controller.signal.aborted) {
+      return res.status(504).json({ code: 'VALIDATION_TIMEOUT', error: 'A validação demorou demais. Tente novamente.' });
+    }
+    return res.status(502).json({ code: 'VALIDATION_FAILED', error: 'Erro ao validar a imagem. Tente novamente.' });
+  } finally {
+    clearTimeout(timeout);
   }
 }
